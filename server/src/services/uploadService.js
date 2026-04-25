@@ -20,11 +20,35 @@ const uploadBuffer = (buffer, folder) =>
   });
 
 export const uploadProfileImage = async (file) => {
-  const result = await uploadBuffer(file.buffer, "farm-market/profiles");
-  return result.secure_url;
+  if (!file) return "";
+
+  if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_SECRET) {
+    // Cloudinary not configured — skip remote upload and return empty string
+    return "";
+  }
+
+  try {
+    const result = await uploadBuffer(file.buffer, "farm-market/profiles");
+    return result.secure_url;
+  } catch (err) {
+    // Log the error and continue — don't fail the whole request for image upload issues
+    console.error("Cloudinary upload error:", err && (err.message || err));
+    return "";
+  }
 };
 
 export const uploadListingImages = async (files = []) => {
-  const uploads = await Promise.all(files.map((file) => uploadBuffer(file.buffer, "farm-market/listings")));
-  return uploads.map((item) => item.secure_url);
+  if (!files.length) return [];
+
+  if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_SECRET) {
+    return [];
+  }
+
+  try {
+    const uploads = await Promise.all(files.map((file) => uploadBuffer(file.buffer, "farm-market/listings")));
+    return uploads.map((item) => item.secure_url);
+  } catch (err) {
+    console.error("Cloudinary listing upload error:", err && (err.message || err));
+    return [];
+  }
 };
