@@ -12,11 +12,24 @@ export const protect = async (req, _res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (jwtError) {
+      const error = new Error(
+        jwtError.name === "TokenExpiredError" 
+          ? "Session expired. Please login again." 
+          : "Invalid token. Please login again."
+      );
+      error.statusCode = 401;
+      throw error;
+    }
+
     const user = await User.findById(decoded.sub).select("_id name phoneNumber role location profilePicture email whatsappNumber");
 
     if (!user) {
-      const error = new Error("User not found for token");
+      const error = new Error("User account no longer exists. Please create a new account.");
       error.statusCode = 401;
       throw error;
     }

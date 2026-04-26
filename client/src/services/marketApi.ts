@@ -3,7 +3,9 @@ import type { AuthResponse, CurrentUserResponse, ListingsResponse, MarketPricesR
 
 export const registerUser = (payload: {
   name: string;
+  email: string;
   phoneNumber: string;
+  password: string;
   role: "farmer" | "buyer";
   location: string;
 }) =>
@@ -12,7 +14,7 @@ export const registerUser = (payload: {
     body: JSON.stringify(payload),
   });
 
-export const loginUser = (payload: { phoneNumber: string }) =>
+export const loginUser = (payload: { emailOrPhone: string; password: string }) =>
   apiRequest<AuthResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify(payload),
@@ -89,7 +91,19 @@ export const updateCurrentUser = (
     formData.append("whatsappNumber", payload.whatsappNumber);
   }
   if (payload.profilePicture) {
+    console.log("=== Adding profilePicture to FormData ===");
+    console.log("File:", payload.profilePicture);
+    console.log("File name:", payload.profilePicture.name);
+    console.log("File size:", payload.profilePicture.size);
+    console.log("File type:", payload.profilePicture.type);
     formData.append("profilePicture", payload.profilePicture);
+  } else {
+    console.log("=== No profilePicture to add ===");
+  }
+
+  console.log("=== FormData contents ===");
+  for (const [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
   }
 
   return apiRequest<{ message: string; user: CurrentUserResponse["user"] }>("/auth/me", {

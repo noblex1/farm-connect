@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingBasket, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OfflineNotice } from "@/components/OfflineNotice";
+import { RoleBasedRedirect } from "@/components/auth/RoleBasedRedirect";
 
 const Landing = () => (
   <section className="animate-gentle-rise">
+    <RoleBasedRedirect />
     <OfflineNotice />
     <div className="relative overflow-hidden rounded-[2rem] border bg-hero-farm p-5 shadow-soft md:p-10">
       <div className="field-lines absolute inset-0 opacity-70" aria-hidden="true" />
@@ -17,10 +19,10 @@ const Landing = () => (
           <p className="mt-4 text-2xl font-bold text-muted-foreground">Sell and buy farm produce easily</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <Button asChild variant="farm" size="touch">
-              <Link to="/farmer"><Sprout className="size-7" />I am a Farmer 🌾</Link>
+              <Link to="/login?role=farmer"><Sprout className="size-7" />I am a Farmer 🌾</Link>
             </Button>
             <Button asChild variant="harvest" size="touch">
-              <Link to="/buyer"><ShoppingBasket className="size-7" />I am a Buyer 🛒</Link>
+              <Link to="/login?role=buyer"><ShoppingBasket className="size-7" />I am a Buyer 🛒</Link>
             </Button>
           </div>
         </div>

@@ -23,7 +23,19 @@ export const apiRequest = async <T>(path: string, options: RequestOptions = {}):
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || "Request failed");
+    // Handle authentication errors specifically
+    if (response.status === 401) {
+      // Clear invalid session data
+      localStorage.removeItem("farm-market-token");
+      localStorage.removeItem("farm-market-user");
+      
+      // If not already on login page, redirect
+      if (!window.location.pathname.includes("/login") && !window.location.pathname.includes("/create-account")) {
+        window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
+      }
+    }
+    
+    throw new Error(data.message || `Request failed with status ${response.status}`);
   }
 
   return data as T;

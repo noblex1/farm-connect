@@ -14,4 +14,14 @@ export const sessionStore = {
       return null;
     }
   },
+  clearSession: () => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem("farm-market-farmer-profile");
+  },
+  isAuthenticated: () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const user = localStorage.getItem(USER_KEY);
+    return Boolean(token && user);
+  },
 };

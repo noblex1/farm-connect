@@ -1,8 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { Home, LineChart, Package, ShoppingBasket, Sprout, UserRound } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { sessionStore } from "@/lib/session";
-import { fetchCurrentUser } from "@/services/marketApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
@@ -13,15 +11,7 @@ const navItems = [
 ];
 
 export const FarmShell = () => {
-  const token = sessionStore.getToken();
-
-  const { data } = useQuery({
-    queryKey: ["currentUser", token],
-    queryFn: () => fetchCurrentUser(token!),
-    enabled: Boolean(token),
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+  const { data } = useCurrentUser();
 
   const user = data?.user;
   const firstName = user?.name.split(" ")[0];

@@ -3,11 +3,11 @@ export type UserRole = "farmer" | "buyer" | "admin";
 export type ApiUser = {
   id: string;
   name: string;
+  email: string;
   phoneNumber: string;
   role: UserRole;
   location: string;
   profilePicture?: string;
-  email?: string;
   whatsappNumber?: string;
   createdAt?: string;
 };

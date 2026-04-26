@@ -113,6 +113,7 @@ const PostProduce = () => {
     }
 
     const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
 
     try {
       await createListing(token, {
@@ -123,8 +124,13 @@ const PostProduce = () => {
         unit: String(form.get("unit") || "bag"),
         images,
       });
+      
       setSuccess(true);
-      (event.currentTarget as HTMLFormElement).reset();
+      
+      // Reset form safely
+      if (formElement) {
+        formElement.reset();
+      }
       
       // Clean up preview URLs
       preview.forEach((url) => URL.revokeObjectURL(url));
@@ -135,6 +141,9 @@ const PostProduce = () => {
         title: "Success!",
         description: "Your produce has been posted to the marketplace.",
       });
+
+      // Scroll to top to show success message
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (requestError) {
       const errorMessage = requestError instanceof Error ? requestError.message : "Could not post produce";
       setError(errorMessage);
@@ -143,6 +152,9 @@ const PostProduce = () => {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);
     }

@@ -1,20 +1,11 @@
 import { LineChart, Package, PlusCircle, User } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { ActionTile } from "@/components/ActionTile";
 import { OfflineNotice } from "@/components/OfflineNotice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { sessionStore } from "@/lib/session";
-import { fetchCurrentUser } from "@/services/marketApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const FarmerDashboard = () => {
-  const token = sessionStore.getToken();
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["currentUser", token],
-    queryFn: () => fetchCurrentUser(token!),
-    enabled: Boolean(token),
-    retry: 1,
-  });
+  const { data, isLoading } = useCurrentUser();
 
   const user = data?.user;
   const firstName = user?.name.split(" ")[0] || "Farmer";

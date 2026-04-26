@@ -1,14 +1,17 @@
-import { MessageCircle, Trash2 } from "lucide-react";
+import { MessageCircle, Trash2, Package } from "lucide-react";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { toProduceCard } from "@/lib/marketMappers";
 import { sessionStore } from "@/lib/session";
 import { deleteListing, fetchMyListings, markListingSold } from "@/services/marketApi";
 import { OfflineNotice } from "@/components/OfflineNotice";
+import { useToast } from "@/hooks/use-toast";
 
 const MyListings = () => {
   const token = sessionStore.getToken();
+  const { toast } = useToast();
 
   const { data, refetch, isLoading, isError, error } = useQuery({
     queryKey: ["my-listings", token],
@@ -26,28 +29,56 @@ const MyListings = () => {
           crop: mapped.crop,
           icon: mapped.icon,
           price: mapped.price,
-          status: item.status === "available" ? "Available" : "Sold",
+          quantity: mapped.quantity,
+          location: mapped.location,
+          images: mapped.images || [],
+          status: item.status,
+          createdAt: item.createdAt,
         };
       }),
     [data]
   );
 
   const onMarkSold = async (id: string) => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
-    await markListingSold(token, id);
-    await refetch();
+    try {
+      await markListingSold(token, id);
+      await refetch();
+      toast({
+        title: "Success!",
+        description: "Listing marked as sold.",
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not mark as sold",
+        variant: "destructive",
+      });
+    }
   };
 
   const onDelete = async (id: string) => {
-    if (!token) {
+    if (!token) return;
+
+    if (!window.confirm("Are you sure you want to delete this listing?")) {
       return;
     }
 
-    await deleteListing(token, id);
-    await refetch();
+    try {
+      await deleteListing(token, id);
+      await refetch();
+      toast({
+        title: "Success!",
+        description: "Listing deleted successfully.",
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Could not delete listing",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -59,7 +90,9 @@ const MyListings = () => {
       </header>
 
       {!token && (
-        <div className="mb-5 rounded-3xl border bg-card p-4 font-bold text-muted-foreground">Login to manage your listings.</div>
+        <div className="mb-5 rounded-3xl border bg-card p-4 font-bold text-muted-foreground">
+          Login to manage your listings.
+        </div>
       )}
 
       {token && isLoading ? (
@@ -68,42 +101,110 @@ const MyListings = () => {
         </div>
       ) : token && isError ? (
         <div className="rounded-3xl border border-destructive bg-card p-8 text-center shadow-touch">
-          <p className="text-2xl font-black text-destructive">{error instanceof Error ? error.message : "Could not load your listings"}</p>
+          <p className="text-2xl font-black text-destructive">
+            {error instanceof Error ? error.message : "Could not load your listings"}
+          </p>
         </div>
       ) : token && items.length < 1 ? (
         <div className="rounded-3xl border bg-card p-8 text-center shadow-touch">
-          <p className="text-6xl" aria-hidden="true">
-            Listings
+          <Package className="mx-auto mb-3 size-16 text-muted-foreground" />
+          <p className="text-2xl font-black">No produce listed yet</p>
+          <p className="mt-2 text-lg font-semibold text-muted-foreground">
+            Start by posting your first produce!
           </p>
-          <p className="mt-3 text-2xl font-black">No produce available yet</p>
         </div>
       ) : token ? (
         <div className="grid gap-4">
           {items.map((item) => (
-            <article key={item.id} className="rounded-3xl border bg-card p-4 shadow-touch md:flex md:items-center md:justify-between">
-              <div className="flex items-center gap-4">
-                <span className="grid size-20 place-items-center rounded-3xl bg-surface-leaf text-5xl" aria-hidden="true">
-                  {item.icon}
-                </span>
-                <div>
-                  <h2 className="text-2xl font-black">{item.crop}</h2>
-                  <p className="text-xl font-black text-primary">{item.price}</p>
-                  <span
-                    className={`mt-2 inline-flex rounded-full px-3 py-1 text-sm font-black ${
-                      item.status === "Available" ? "bg-surface-leaf text-success" : "bg-earth-soft text-secondary"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
+            <article
+              key={item.id}
+              className="overflow-hidden rounded-3xl border bg-card shadow-touch transition hover:shadow-soft"
+            >
+              <div className="md:flex">
+                {/* Image Section */}
+                {item.images.length > 0 ? (
+                  <div className="relative h-48 md:h-auto md:w-48 shrink-0">
+                    <img
+                      src={item.images[0]}
+                      alt={item.crop}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    {item.status === "sold" && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                        <Badge variant="destructive" className="text-base font-black px-3 py-1">
+                          SOLD
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex h-48 items-center justify-center bg-surface-leaf md:h-auto md:w-48">
+                    <span className="text-6xl" aria-hidden="true">
+                      {item.icon}
+                    </span>
+                  </div>
+                )}
+
+                {/* Content Section */}
+                <div className="flex flex-1 flex-col justify-between p-4">
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h2 className="text-2xl font-black">{item.crop}</h2>
+                        <p className="text-xl font-black text-primary">{item.price}</p>
+                        <p className="text-base font-semibold text-muted-foreground">
+                          {item.quantity}
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-muted-foreground">
+                          📍 {item.location}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={item.status === "available" ? "default" : "secondary"}
+                        className="shrink-0"
+                      >
+                        {item.status === "available" ? "Available" : "Sold"}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {item.status === "available" ? (
+                      <>
+                        <Button
+                          variant="earth"
+                          size="lg"
+                          onClick={() => onMarkSold(String(item.id))}
+                          className="font-bold"
+                        >
+                          <MessageCircle className="size-5" />
+                          Mark Sold
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="lg"
+                          onClick={() => onDelete(String(item.id))}
+                          className="font-bold"
+                        >
+                          <Trash2 className="size-5" />
+                          Delete
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="destructive"
+                        size="lg"
+                        onClick={() => onDelete(String(item.id))}
+                        className="col-span-2 font-bold"
+                      >
+                        <Trash2 className="size-5" />
+                        Delete Listing
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-2 md:mt-0">
-                <Button variant="earth" size="lg" onClick={() => onMarkSold(String(item.id))}>
-                  <MessageCircle className="size-5" />Mark Sold
-                </Button>
-                <Button variant="destructive" size="lg" onClick={() => onDelete(String(item.id))}>
-                  <Trash2 className="size-5" />Delete
-                </Button>
               </div>
             </article>
           ))}

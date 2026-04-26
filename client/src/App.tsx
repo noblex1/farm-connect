@@ -16,6 +16,7 @@ import MyListings from "./pages/MyListings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import PostProduce from "./pages/PostProduce.tsx";
 import UserProfile from "./pages/UserProfile.tsx";
+import DiagnosticProfile from "./pages/DiagnosticProfile.tsx";
 
 const queryClient = new QueryClient();
 
@@ -31,14 +32,24 @@ const App = () => (
             <Route path="home" element={<Landing />} />
             <Route path="login" element={<FarmerLogin />} />
             <Route path="create-account" element={<FarmerCreateAccount />} />
+            <Route path="diagnostic" element={<DiagnosticProfile />} />
+            
+            {/* Buyer Routes */}
             <Route element={<RequireAuth allowedRoles={["buyer"]} />}>
               <Route path="buyer" element={<BuyerMarketplace />} />
+              <Route path="marketplace" element={<BuyerMarketplace />} />
             </Route>
+            
+            {/* Farmer Routes */}
             <Route element={<RequireAuth allowedRoles={["farmer"]} />}>
               <Route path="farmer" element={<FarmerDashboard />} />
+              <Route path="farmer/dashboard" element={<FarmerDashboard />} />
+              <Route path="farmer/listings" element={<MyListings />} />
               <Route path="post" element={<PostProduce />} />
               <Route path="listings" element={<MyListings />} />
             </Route>
+            
+            {/* Shared Routes */}
             <Route element={<RequireAuth allowedRoles={["farmer", "buyer", "admin"]} />}>
               <Route path="profile" element={<UserProfile />} />
               <Route path="prices" element={<MarketPrices />} />

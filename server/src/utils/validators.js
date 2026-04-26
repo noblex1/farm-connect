@@ -5,19 +5,22 @@ const roles = ["farmer", "buyer"];
 
 export const registerValidation = [
   body("name").trim().isLength({ min: 2, max: 80 }).withMessage("name must be 2-80 chars"),
+  body("email").trim().isEmail().withMessage("valid email is required"),
   body("phoneNumber")
     .trim()
     .matches(/^\+?[0-9]{9,15}$/)
     .withMessage("phoneNumber must be a valid mobile number"),
+  body("password").isLength({ min: 6 }).withMessage("password must be at least 6 characters"),
   body("role").isIn(roles).withMessage("role must be farmer or buyer"),
   body("location").trim().isLength({ min: 2, max: 80 }).withMessage("location is required"),
 ];
 
 export const loginValidation = [
-  body("phoneNumber")
+  body("emailOrPhone")
     .trim()
-    .matches(/^\+?[0-9]{9,15}$/)
-    .withMessage("phoneNumber must be a valid mobile number"),
+    .notEmpty()
+    .withMessage("email or phone number is required"),
+  body("password").notEmpty().withMessage("password is required"),
 ];
 
 export const createListingValidation = [
