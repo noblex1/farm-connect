@@ -1,9 +1,9 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { Mail, MessageCircle, Phone, Sprout, Upload, UserRound } from "lucide-react";
+import { Mail, MessageCircle, Phone, Upload, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LogoutButton } from "@/components/LogoutButton";
 import { sessionStore } from "@/lib/session";
 import { updateCurrentUser } from "@/services/marketApi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -254,11 +254,7 @@ const UserProfile = () => {
           {isSaving ? "Saving..." : "Save Profile"}
         </Button>
 
-        <Button asChild variant="outline" size="touch">
-          <Link to="/create-account">
-            <Sprout className="size-7" />Create Another Account
-          </Link>
-        </Button>
+        <LogoutButton variant="destructive" size="touch" />
       </form>
     </section>
   );
