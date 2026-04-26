@@ -1,6 +1,7 @@
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/auth";
+import { toast } from "@/hooks/use-toast";
 
 type LogoutButtonProps = {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "farm" | "harvest";
@@ -16,9 +17,15 @@ export const LogoutButton = ({
   showIcon = true 
 }: LogoutButtonProps) => {
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")) {
+    toast({
+      title: "Logging out...",
+      description: "You have been successfully logged out.",
+    });
+    
+    // Small delay to show the toast before redirect
+    setTimeout(() => {
       logout();
-    }
+    }, 500);
   };
 
   return (
