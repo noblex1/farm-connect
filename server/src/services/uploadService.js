@@ -1,14 +1,18 @@
 import cloudinary from "../config/cloudinary.js";
 
-const uploadBuffer = (buffer, folder) =>
+const uploadBuffer = (buffer, folder, options = {}) =>
   new Promise((resolve, reject) => {
+    const uploadOptions = {
+      folder,
+      resource_type: "auto", // Let Cloudinary auto-detect the resource type
+      ...options,
+    };
+
     const stream = cloudinary.uploader.upload_stream(
-      {
-        folder,
-        resource_type: "image",
-      },
+      uploadOptions,
       (error, result) => {
         if (error) {
+          console.error("Cloudinary stream error:", error);
           reject(error);
           return;
         }
@@ -16,7 +20,9 @@ const uploadBuffer = (buffer, folder) =>
       }
     );
 
-    stream.end(buffer);
+    // Write the buffer to the stream
+    stream.write(buffer);
+    stream.end();
   });
 
 export const uploadProfileImage = async (file) => {
@@ -45,6 +51,18 @@ export const uploadProfileImage = async (file) => {
     return "";
   }
 
+  // Validate buffer is not empty
+  if (file.buffer.length === 0) {
+    console.error("❌ File buffer is empty!");
+    return "";
+  }
+
+  // Validate mimetype
+  if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+    console.error("❌ Invalid mimetype:", file.mimetype);
+    return "";
+  }
+
   if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_SECRET) {
     console.error("❌ Cloudinary not configured - missing environment variables");
     console.log("CLOUDINARY_CLOUD_NAME:", process.env.CLOUDINARY_CLOUD_NAME);
@@ -62,7 +80,18 @@ export const uploadProfileImage = async (file) => {
   try {
     console.log("Starting Cloudinary upload...");
     console.log("Buffer size:", file.buffer.length, "bytes");
-    const result = await uploadBuffer(file.buffer, "farm-market/profiles");
+    console.log("Buffer first 20 bytes:", file.buffer.slice(0, 20).toString("hex"));
+    
+    // Upload with format hint from mimetype
+    const format = file.mimetype.split("/")[1];
+    const result = await uploadBuffer(file.buffer, "farm-market/profiles", {
+      format: format,
+      transformation: [
+        { width: 500, height: 500, crop: "limit" },
+        { quality: "auto" },
+      ],
+    });
+    
     console.log("✅ Cloudinary upload successful!");
     console.log("Secure URL:", result.secure_url);
     console.log("Public ID:", result.public_id);
@@ -83,14 +112,28 @@ export const uploadListingImages = async (files = []) => {
   if (!files.length) return [];
 
   if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_SECRET) {
+    console.error("❌ Cloudinary not configured for listing images");
     return [];
   }
 
   try {
-    const uploads = await Promise.all(files.map((file) => uploadBuffer(file.buffer, "farm-market/listings")));
+    const uploads = await Promise.all(
+      files.map((file) => {
+        const format = file.mimetype.split("/")[1];
+        return uploadBuffer(file.buffer, "farm-market/listings", {
+          format: format,
+          transformation: [
+            { width: 1200, height: 1200, crop: "limit" },
+            { quality: "auto" },
+          ],
+        });
+      })
+    );
     return uploads.map((item) => item.secure_url);
   } catch (err) {
-    console.error("Cloudinary listing upload error:", err && (err.message || err));
+    console.error("❌ Cloudinary listing upload error:");
+    console.error("  Message:", err.message);
+    console.error("  Full error:", err);
     return [];
   }
 };
