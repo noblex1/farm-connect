@@ -1,9 +1,9 @@
 import type { ApiListing, ApiMarketPrice } from "@/types/api";
 
 const cropMeta: Record<"maize" | "rice" | "yam", { label: string; icon: string }> = {
-  maize: { label: "Maize", icon: "??" },
-  rice: { label: "Rice", icon: "??" },
-  yam: { label: "Yam", icon: "??" },
+  maize: { label: "Maize", icon: "🌽" },
+  rice: { label: "Rice", icon: "🌾" },
+  yam: { label: "Yam", icon: "🍠" },
 };
 
 const cedi = new Intl.NumberFormat("en-GH", {
@@ -21,6 +21,9 @@ export const toProduceCard = (item: ApiListing) => ({
   location: item.location,
   farmer: item.farmer?.name || "Farmer",
   phone: item.farmer?.phoneNumber || "",
+  images: item.images || [],
+  status: item.status,
+  createdAt: item.createdAt,
 });
 
 export const toPriceCard = (item: ApiMarketPrice) => ({

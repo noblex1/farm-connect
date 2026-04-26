@@ -1,6 +1,6 @@
 export const cropOptions = [
-  { value: "maize", label: "Maize", icon: "Corn" },
-  { value: "rice", label: "Rice", icon: "Rice" },
-  { value: "yam", label: "Yam", icon: "Yam" },
+  { value: "maize", label: "Maize", icon: "🌽" },
+  { value: "rice", label: "Rice", icon: "🌾" },
+  { value: "yam", label: "Yam", icon: "🍠" },
 ] as const;
 
