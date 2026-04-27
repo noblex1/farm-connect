@@ -14,7 +14,12 @@ import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(",") || "*" }));
+app.use(cors({ 
+  origin: process.env.CLIENT_ORIGIN?.split(",") || "*",
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(compression());
 app.use(express.json({ limit: "200kb" }));
 app.use(express.urlencoded({ extended: false, limit: "200kb" }));
