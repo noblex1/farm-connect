@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { Home, LineChart, Package, ShoppingBasket, Sprout, UserRound } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { InstallPWA } from "@/components/InstallPWA";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home, roles: ["farmer", "buyer", "admin"] },
@@ -52,6 +53,9 @@ export const FarmShell = () => {
       <main className="mx-auto max-w-5xl px-4 pb-28 pt-4 md:pb-8">
         <Outlet />
       </main>
+
+      {/* PWA Install Prompt */}
+      <InstallPWA />
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/98 safe-bottom shadow-soft md:hidden" aria-label="Main navigation">
         <div className="grid grid-cols-5 px-1 pt-2">
