@@ -180,11 +180,17 @@ const UserProfile = () => {
   return (
     <section className="animate-gentle-rise">
       <header className="mb-5 rounded-3xl bg-surface-leaf p-5 shadow-touch">
-        <div className="mb-3 grid size-24 place-items-center overflow-hidden rounded-3xl bg-card text-5xl shadow-touch" aria-hidden="true">
-          {avatarSrc ? <img src={avatarSrc} alt="Profile" className="h-full w-full object-cover" /> : "👤"}
+        {/* Mobile: Show only profile picture */}
+        <div className="flex flex-col items-center md:items-start">
+          <div className="grid size-24 place-items-center overflow-hidden rounded-3xl bg-card text-5xl shadow-touch" aria-hidden="true">
+            {avatarSrc ? <img src={avatarSrc} alt="Profile" className="h-full w-full object-cover" /> : "👤"}
+          </div>
+          {/* Desktop: Show role and name */}
+          <div className="hidden md:block mt-3">
+            <p className="text-lg font-bold text-muted-foreground">{profile.role} Profile</p>
+            <h1 className="mt-1 text-4xl font-black">{profile.name}</h1>
+          </div>
         </div>
-        <p className="text-lg font-bold text-muted-foreground">{profile.role} Profile</p>
-        <h1 className="mt-1 text-4xl font-black">{profile.name}</h1>
       </header>
 
       {saveError && <div className="mb-4 rounded-2xl border border-destructive bg-card p-3 font-bold text-destructive">{saveError}</div>}
