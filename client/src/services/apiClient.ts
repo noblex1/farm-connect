@@ -18,6 +18,7 @@ export const apiRequest = async <T>(path: string, options: RequestOptions = {}):
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers,
+    credentials: 'include', // Include credentials for CORS
   });
 
   const data = await response.json().catch(() => ({}));
