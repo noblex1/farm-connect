@@ -49,7 +49,8 @@ const FarmerLogin = () => {
         password: parsed.data.password,
       });
 
-      if (requestedRole && response.user.role !== requestedRole) {
+      // Allow admin to login regardless of requested role
+      if (requestedRole && response.user.role !== requestedRole && response.user.role !== 'admin') {
         setError(`This account is registered as ${response.user.role}. Please use a ${roleLabel.toLowerCase()} account.`);
         setIsLoading(false);
         return;
@@ -73,7 +74,7 @@ const FarmerLogin = () => {
       const roleRoutes: Record<string, string> = {
         farmer: "/farmer",
         buyer: "/buyer",
-        admin: "/prices",
+        admin: "/admin",
       };
 
       // If there's a next path and user has permission, go there

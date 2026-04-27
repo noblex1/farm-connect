@@ -17,6 +17,11 @@ import NotFound from "./pages/NotFound.tsx";
 import PostProduce from "./pages/PostProduce.tsx";
 import UserProfile from "./pages/UserProfile.tsx";
 import DiagnosticProfile from "./pages/DiagnosticProfile.tsx";
+import AdminDashboard from "./pages/AdminDashboard.tsx";
+import AdminUsers from "./pages/AdminUsers.tsx";
+import AdminListings from "./pages/AdminListings.tsx";
+import AdminPrices from "./pages/AdminPrices.tsx";
+import AdminAnalytics from "./pages/AdminAnalytics.tsx";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +52,16 @@ const App = () => (
               <Route path="farmer/listings" element={<MyListings />} />
               <Route path="post" element={<PostProduce />} />
               <Route path="listings" element={<MyListings />} />
+            </Route>
+            
+            {/* Admin Routes */}
+            <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+              <Route path="admin" element={<AdminDashboard />} />
+              <Route path="admin/dashboard" element={<AdminDashboard />} />
+              <Route path="admin/users" element={<AdminUsers />} />
+              <Route path="admin/listings" element={<AdminListings />} />
+              <Route path="admin/prices" element={<AdminPrices />} />
+              <Route path="admin/analytics" element={<AdminAnalytics />} />
             </Route>
             
             {/* Shared Routes */}

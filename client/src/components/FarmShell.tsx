@@ -3,11 +3,12 @@ import { Home, LineChart, Package, ShoppingBasket, Sprout, UserRound } from "luc
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const navItems = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/buyer", label: "Buy", icon: ShoppingBasket },
-  { to: "/farmer", label: "Farmer", icon: Sprout },
-  { to: "/prices", label: "Prices", icon: LineChart },
-  { to: "/listings", label: "Mine", icon: Package },
+  { to: "/", label: "Home", icon: Home, roles: ["farmer", "buyer", "admin"] },
+  { to: "/buyer", label: "Buy", icon: ShoppingBasket, roles: ["buyer"] },
+  { to: "/farmer", label: "Farmer", icon: Sprout, roles: ["farmer"] },
+  { to: "/admin", label: "Admin", icon: LineChart, roles: ["admin"] },
+  { to: "/prices", label: "Prices", icon: LineChart, roles: ["farmer", "buyer"] },
+  { to: "/listings", label: "Mine", icon: Package, roles: ["farmer"] },
 ];
 
 export const FarmShell = () => {
@@ -15,6 +16,11 @@ export const FarmShell = () => {
 
   const user = data?.user;
   const firstName = user?.name.split(" ")[0];
+  
+  // Filter nav items based on user role
+  const visibleNavItems = user?.role 
+    ? navItems.filter(item => item.roles.includes(user.role))
+    : navItems;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -49,7 +55,7 @@ export const FarmShell = () => {
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/98 safe-bottom shadow-soft md:hidden" aria-label="Main navigation">
         <div className="grid grid-cols-5 px-1 pt-2">
-          {navItems.map(({ to, label, icon: Icon }) => (
+          {visibleNavItems.slice(0, 5).map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}

@@ -19,7 +19,7 @@ export const RoleBasedRedirect = () => {
       const roleRoutes: Record<string, string> = {
         farmer: "/farmer",
         buyer: "/buyer",
-        admin: "/prices",
+        admin: "/admin",
       };
 
       const targetRoute = roleRoutes[user.role];
