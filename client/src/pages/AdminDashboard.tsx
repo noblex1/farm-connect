@@ -70,34 +70,34 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="animate-gentle-rise space-y-6">
+    <div className="animate-gentle-rise space-y-4 sm:space-y-5 md:space-y-6">
       {/* Header */}
-      <header className="rounded-3xl border bg-gradient-to-br from-primary/10 via-surface-leaf to-accent/10 p-6 shadow-touch">
-        <div className="flex items-center gap-3">
-          <div className="grid size-16 place-items-center rounded-3xl bg-primary text-4xl text-primary-foreground shadow-touch">
-            <BarChart3 className="size-8" />
+      <header className="rounded-2xl sm:rounded-3xl border bg-gradient-to-br from-primary/10 via-surface-leaf to-accent/10 p-4 sm:p-5 md:p-6 shadow-touch">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="grid size-12 sm:size-14 md:size-16 place-items-center rounded-2xl sm:rounded-3xl bg-primary text-3xl sm:text-4xl text-primary-foreground shadow-touch">
+            <BarChart3 className="size-6 sm:size-7 md:size-8" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-foreground">Admin Dashboard</h1>
-            <p className="text-lg font-semibold text-muted-foreground">Manage your farm marketplace</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">Admin Dashboard</h1>
+            <p className="text-sm sm:text-base md:text-lg font-semibold text-muted-foreground">Manage your farm marketplace</p>
           </div>
         </div>
       </header>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => (
           <Link key={stat.title} to={stat.link}>
-            <Card className="group cursor-pointer rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-primary hover:shadow-soft">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-bold">{stat.title}</CardTitle>
-                <div className={`rounded-2xl ${stat.bgColor} p-2`}>
-                  <stat.icon className={`size-5 ${stat.color}`} />
+            <Card className="group cursor-pointer rounded-2xl sm:rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-primary hover:shadow-soft">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-4 md:p-6">
+                <CardTitle className="text-xs sm:text-sm font-bold">{stat.title}</CardTitle>
+                <div className={`rounded-xl sm:rounded-2xl ${stat.bgColor} p-1.5 sm:p-2`}>
+                  <stat.icon className={`size-4 sm:size-5 ${stat.color}`} />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-black">{stat.value}</div>
-                <p className="mt-1 text-xs font-semibold text-muted-foreground">{stat.description}</p>
+              <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0 md:p-6 md:pt-0">
+                <div className="text-xl sm:text-2xl md:text-3xl font-black">{stat.value}</div>
+                <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs font-semibold text-muted-foreground line-clamp-1">{stat.description}</p>
               </CardContent>
             </Card>
           </Link>
@@ -105,67 +105,67 @@ const AdminDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-3">
         <Link to="/admin/users">
-          <Card className="group cursor-pointer rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-primary">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="size-6 text-primary" />
+          <Card className="group cursor-pointer rounded-2xl sm:rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-primary">
+            <CardHeader className="p-4 sm:p-5 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Users className="size-5 sm:size-6 text-primary" />
                 Manage Users
               </CardTitle>
-              <CardDescription className="font-semibold">View and manage farmers and buyers</CardDescription>
+              <CardDescription className="font-semibold text-xs sm:text-sm">View and manage farmers and buyers</CardDescription>
             </CardHeader>
           </Card>
         </Link>
 
         <Link to="/admin/listings">
-          <Card className="group cursor-pointer rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-secondary">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="size-6 text-secondary" />
+          <Card className="group cursor-pointer rounded-2xl sm:rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-secondary">
+            <CardHeader className="p-4 sm:p-5 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Package className="size-5 sm:size-6 text-secondary" />
                 Manage Listings
               </CardTitle>
-              <CardDescription className="font-semibold">Monitor and moderate produce listings</CardDescription>
+              <CardDescription className="font-semibold text-xs sm:text-sm">Monitor and moderate produce listings</CardDescription>
             </CardHeader>
           </Card>
         </Link>
 
         <Link to="/admin/prices">
-          <Card className="group cursor-pointer rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-accent">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="size-6 text-accent" />
+          <Card className="group cursor-pointer rounded-2xl sm:rounded-3xl border-2 shadow-touch transition-all hover:scale-105 hover:border-accent">
+            <CardHeader className="p-4 sm:p-5 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <DollarSign className="size-5 sm:size-6 text-accent" />
                 Market Prices
               </CardTitle>
-              <CardDescription className="font-semibold">Update and manage market prices</CardDescription>
+              <CardDescription className="font-semibold text-xs sm:text-sm">Update and manage market prices</CardDescription>
             </CardHeader>
           </Card>
         </Link>
       </div>
 
       {/* Recent Activity */}
-      <Card className="rounded-3xl border-2 shadow-touch">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="size-6 text-success" />
+      <Card className="rounded-2xl sm:rounded-3xl border-2 shadow-touch">
+        <CardHeader className="p-4 sm:p-5 md:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+            <TrendingUp className="size-5 sm:size-6 text-success" />
             Recent Activity
           </CardTitle>
-          <CardDescription className="font-semibold">Latest actions on the platform</CardDescription>
+          <CardDescription className="font-semibold text-xs sm:text-sm">Latest actions on the platform</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
+        <CardContent className="p-4 pt-0 sm:p-5 sm:pt-0 md:p-6 md:pt-0">
+          <div className="space-y-2 sm:space-y-3">
             {stats?.recentActivities?.slice(0, 5).map((activity: any, index: number) => (
-              <div key={index} className="flex items-center gap-3 rounded-2xl border bg-surface-leaf p-3">
-                <div className="grid size-10 place-items-center rounded-xl bg-primary/10 text-xl">
+              <div key={index} className="flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border bg-surface-leaf p-2 sm:p-3">
+                <div className="grid size-8 sm:size-10 place-items-center rounded-lg sm:rounded-xl bg-primary/10 text-lg sm:text-xl">
                   {activity.type === "user" ? "👤" : activity.type === "listing" ? "📦" : "💰"}
                 </div>
-                <div className="flex-1">
-                  <p className="font-bold text-sm">{activity.message}</p>
-                  <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-xs sm:text-sm truncate">{activity.message}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">{activity.timestamp}</p>
                 </div>
               </div>
             )) || (
-              <p className="text-center text-muted-foreground py-4">No recent activity</p>
+              <p className="text-center text-muted-foreground py-4 text-sm">No recent activity</p>
             )}
           </div>
         </CardContent>

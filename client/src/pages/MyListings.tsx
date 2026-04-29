@@ -84,46 +84,46 @@ const MyListings = () => {
   return (
     <section className="animate-gentle-rise">
       <OfflineNotice />
-      <header className="mb-5">
-        <h1 className="text-4xl font-black">My Listings</h1>
-        <p className="mt-2 text-xl font-bold text-muted-foreground">Manage your produce quickly</p>
+      <header className="mb-4 sm:mb-5">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black">My Listings</h1>
+        <p className="mt-1 sm:mt-2 text-base sm:text-lg md:text-xl font-bold text-muted-foreground">Manage your produce quickly</p>
       </header>
 
       {!token && (
-        <div className="mb-5 rounded-3xl border bg-card p-4 font-bold text-muted-foreground">
+        <div className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl border bg-card p-3 sm:p-4 text-sm sm:text-base font-bold text-muted-foreground">
           Login to manage your listings.
         </div>
       )}
 
       {token && isLoading ? (
-        <div className="rounded-3xl border bg-card p-8 text-center shadow-touch">
-          <p className="text-2xl font-black">Loading your listings...</p>
+        <div className="rounded-2xl sm:rounded-3xl border bg-card p-6 sm:p-8 text-center shadow-touch">
+          <p className="text-lg sm:text-xl md:text-2xl font-black">Loading your listings...</p>
         </div>
       ) : token && isError ? (
-        <div className="rounded-3xl border border-destructive bg-card p-8 text-center shadow-touch">
-          <p className="text-2xl font-black text-destructive">
+        <div className="rounded-2xl sm:rounded-3xl border border-destructive bg-card p-6 sm:p-8 text-center shadow-touch">
+          <p className="text-lg sm:text-xl md:text-2xl font-black text-destructive">
             {error instanceof Error ? error.message : "Could not load your listings"}
           </p>
         </div>
       ) : token && items.length < 1 ? (
-        <div className="rounded-3xl border bg-card p-8 text-center shadow-touch">
-          <Package className="mx-auto mb-3 size-16 text-muted-foreground" />
-          <p className="text-2xl font-black">No produce listed yet</p>
-          <p className="mt-2 text-lg font-semibold text-muted-foreground">
+        <div className="rounded-2xl sm:rounded-3xl border bg-card p-6 sm:p-8 text-center shadow-touch">
+          <Package className="mx-auto mb-3 size-12 sm:size-16 text-muted-foreground" />
+          <p className="text-lg sm:text-xl md:text-2xl font-black">No produce listed yet</p>
+          <p className="mt-2 text-sm sm:text-base md:text-lg font-semibold text-muted-foreground">
             Start by posting your first produce!
           </p>
         </div>
       ) : token ? (
-        <div className="grid gap-4">
+        <div className="grid gap-3 sm:gap-4">
           {items.map((item) => (
             <article
               key={item.id}
-              className="overflow-hidden rounded-3xl border bg-card shadow-touch transition hover:shadow-soft"
+              className="overflow-hidden rounded-2xl sm:rounded-3xl border bg-card shadow-touch transition hover:shadow-soft"
             >
               <div className="md:flex">
                 {/* Image Section */}
                 {item.images.length > 0 ? (
-                  <div className="relative h-48 md:h-auto md:w-48 shrink-0">
+                  <div className="relative h-40 sm:h-48 md:h-auto md:w-48 shrink-0">
                     <img
                       src={item.images[0]}
                       alt={item.crop}
@@ -132,37 +132,37 @@ const MyListings = () => {
                     />
                     {item.status === "sold" && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                        <Badge variant="destructive" className="text-base font-black px-3 py-1">
+                        <Badge variant="destructive" className="text-sm sm:text-base font-black px-2 sm:px-3 py-0.5 sm:py-1">
                           SOLD
                         </Badge>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="flex h-48 items-center justify-center bg-surface-leaf md:h-auto md:w-48">
-                    <span className="text-6xl" aria-hidden="true">
+                  <div className="flex h-32 sm:h-40 items-center justify-center bg-surface-leaf md:h-auto md:w-48">
+                    <span className="text-5xl sm:text-6xl" aria-hidden="true">
                       {item.icon}
                     </span>
                   </div>
                 )}
 
                 {/* Content Section */}
-                <div className="flex flex-1 flex-col justify-between p-4">
+                <div className="flex flex-1 flex-col justify-between p-3 sm:p-4 md:p-5">
                   <div>
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h2 className="text-2xl font-black">{item.crop}</h2>
-                        <p className="text-xl font-black text-primary">{item.price}</p>
-                        <p className="text-base font-semibold text-muted-foreground">
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-black">{item.crop}</h2>
+                        <p className="text-base sm:text-lg md:text-xl font-black text-primary">{item.price}</p>
+                        <p className="text-sm sm:text-base font-semibold text-muted-foreground">
                           {item.quantity}
                         </p>
-                        <p className="mt-1 text-sm font-medium text-muted-foreground">
+                        <p className="mt-1 text-xs sm:text-sm font-medium text-muted-foreground">
                           📍 {item.location}
                         </p>
                       </div>
                       <Badge
                         variant={item.status === "available" ? "default" : "secondary"}
-                        className="shrink-0"
+                        className="shrink-0 text-xs sm:text-sm"
                       >
                         {item.status === "available" ? "Available" : "Sold"}
                       </Badge>
@@ -170,36 +170,36 @@ const MyListings = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="mt-4 grid grid-cols-2 gap-2">
+                  <div className="mt-3 sm:mt-4 grid grid-cols-1 xs:grid-cols-2 gap-2">
                     {item.status === "available" ? (
                       <>
                         <Button
                           variant="earth"
-                          size="lg"
+                          size="default"
                           onClick={() => onMarkSold(String(item.id))}
-                          className="font-bold"
+                          className="font-bold h-10 sm:h-11 text-sm sm:text-base"
                         >
-                          <MessageCircle className="size-5" />
+                          <MessageCircle className="size-4 sm:size-5" />
                           Mark Sold
                         </Button>
                         <Button
                           variant="destructive"
-                          size="lg"
+                          size="default"
                           onClick={() => onDelete(String(item.id))}
-                          className="font-bold"
+                          className="font-bold h-10 sm:h-11 text-sm sm:text-base"
                         >
-                          <Trash2 className="size-5" />
+                          <Trash2 className="size-4 sm:size-5" />
                           Delete
                         </Button>
                       </>
                     ) : (
                       <Button
                         variant="destructive"
-                        size="lg"
+                        size="default"
                         onClick={() => onDelete(String(item.id))}
-                        className="col-span-2 font-bold"
+                        className="col-span-full font-bold h-10 sm:h-11 text-sm sm:text-base"
                       >
-                        <Trash2 className="size-5" />
+                        <Trash2 className="size-4 sm:size-5" />
                         Delete Listing
                       </Button>
                     )}

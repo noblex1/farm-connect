@@ -163,34 +163,34 @@ const PostProduce = () => {
   return (
     <section className="animate-gentle-rise">
       <OfflineNotice />
-      <header className="mb-5">
-        <h1 className="text-4xl font-black">Post Produce</h1>
-        <p className="mt-2 text-xl font-bold text-muted-foreground">List your crops for buyers</p>
+      <header className="mb-4 sm:mb-5">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black">Post Produce</h1>
+        <p className="mt-1 sm:mt-2 text-base sm:text-lg md:text-xl font-bold text-muted-foreground">List your crops for buyers</p>
       </header>
 
       {success && (
         <div
-          className="mb-5 flex items-center gap-3 rounded-3xl border bg-surface-leaf p-4 text-xl font-black text-primary shadow-touch"
+          className="mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3 rounded-2xl sm:rounded-3xl border bg-surface-leaf p-3 sm:p-4 text-base sm:text-lg md:text-xl font-black text-primary shadow-touch"
           role="status"
         >
-          <CheckCircle2 className="size-8" aria-hidden="true" />
+          <CheckCircle2 className="size-6 sm:size-8" aria-hidden="true" />
           Produce posted successfully
         </div>
       )}
 
       {error && (
-        <div className="mb-5 rounded-3xl border border-destructive bg-card p-4 font-bold text-destructive" role="alert">
+        <div className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl border border-destructive bg-card p-3 sm:p-4 text-sm sm:text-base font-bold text-destructive" role="alert">
           {error}
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="grid gap-5 rounded-3xl border bg-card p-5 shadow-touch md:p-6">
-        <label className="grid gap-2 text-lg font-black">
+      <form onSubmit={onSubmit} className="grid gap-4 sm:gap-5 rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 md:p-6 shadow-touch">
+        <label className="grid gap-1.5 sm:gap-2 text-base sm:text-lg font-black">
           Crop Type *
           <select
             name="cropType"
             required
-            className="min-h-14 rounded-2xl border bg-background px-4 text-lg font-bold transition focus:ring-2 focus:ring-primary"
+            className="min-h-12 sm:min-h-14 rounded-xl sm:rounded-2xl border bg-background px-3 sm:px-4 text-base sm:text-lg font-bold transition focus:ring-2 focus:ring-primary"
           >
             {cropOptions.map((crop) => (
               <option key={crop.value} value={crop.value}>
@@ -200,8 +200,8 @@ const PostProduce = () => {
           </select>
         </label>
 
-        <div className="grid gap-5 md:grid-cols-2">
-          <label className="grid gap-2 text-lg font-black">
+        <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
+          <label className="grid gap-1.5 sm:gap-2 text-base sm:text-lg font-black">
             Quantity *
             <input
               name="quantity"
@@ -209,23 +209,23 @@ const PostProduce = () => {
               min="1"
               type="number"
               placeholder="e.g., 10"
-              className="min-h-14 rounded-2xl border bg-background px-4 text-lg font-bold transition focus:ring-2 focus:ring-primary"
+              className="min-h-12 sm:min-h-14 rounded-xl sm:rounded-2xl border bg-background px-3 sm:px-4 text-base sm:text-lg font-bold transition focus:ring-2 focus:ring-primary"
             />
           </label>
 
-          <label className="grid gap-2 text-lg font-black">
+          <label className="grid gap-1.5 sm:gap-2 text-base sm:text-lg font-black">
             Unit
             <input
               name="unit"
               type="text"
               placeholder="bag, kg, ton"
               defaultValue="bag"
-              className="min-h-14 rounded-2xl border bg-background px-4 text-lg font-bold transition focus:ring-2 focus:ring-primary"
+              className="min-h-12 sm:min-h-14 rounded-xl sm:rounded-2xl border bg-background px-3 sm:px-4 text-base sm:text-lg font-bold transition focus:ring-2 focus:ring-primary"
             />
           </label>
         </div>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-1.5 sm:gap-2 text-base sm:text-lg font-black">
           Price (GH₵) *
           <input
             name="price"
@@ -234,19 +234,19 @@ const PostProduce = () => {
             type="number"
             step="0.01"
             placeholder="e.g., 420"
-            className="min-h-14 rounded-2xl border bg-background px-4 text-lg font-bold transition focus:ring-2 focus:ring-primary"
+            className="min-h-12 sm:min-h-14 rounded-xl sm:rounded-2xl border bg-background px-3 sm:px-4 text-base sm:text-lg font-bold transition focus:ring-2 focus:ring-primary"
           />
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-1.5 sm:gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
-            <MapPin className="size-6 text-secondary" />
+            <MapPin className="size-5 sm:size-6 text-secondary" />
             Location *
           </span>
           <select
             name="location"
             required
-            className="min-h-14 rounded-2xl border bg-background px-4 text-lg font-bold transition focus:ring-2 focus:ring-primary"
+            className="min-h-12 sm:min-h-14 rounded-xl sm:rounded-2xl border bg-background px-3 sm:px-4 text-base sm:text-lg font-bold transition focus:ring-2 focus:ring-primary"
           >
             <option>Tamale</option>
             <option>Savelugu</option>
@@ -258,14 +258,14 @@ const PostProduce = () => {
         </label>
 
         {/* Image Upload Section */}
-        <div className="grid gap-3">
+        <div className="grid gap-2 sm:gap-3">
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-lg font-black">
-              <ImagePlus className="size-6 text-primary" />
+            <label className="flex items-center gap-2 text-base sm:text-lg font-black">
+              <ImagePlus className="size-5 sm:size-6 text-primary" />
               Photos (Optional)
             </label>
             {images.length > 0 && (
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="text-xs sm:text-sm">
                 {images.length} / {MAX_IMAGES}
               </Badge>
             )}
@@ -276,7 +276,7 @@ const PostProduce = () => {
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
-            className={`relative rounded-2xl border-2 border-dashed transition ${
+            className={`relative rounded-xl sm:rounded-2xl border-2 border-dashed transition ${
               isDragging
                 ? "border-primary bg-primary/10"
                 : "border-muted-foreground/30 bg-background hover:border-primary/50"
@@ -293,17 +293,17 @@ const PostProduce = () => {
             />
             <label
               htmlFor="image-upload"
-              className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 p-6 text-center"
+              className="flex min-h-28 sm:min-h-32 cursor-pointer flex-col items-center justify-center gap-1.5 sm:gap-2 p-4 sm:p-6 text-center"
             >
-              <Upload className={`size-10 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
-              <p className="text-base font-bold text-muted-foreground">
+              <Upload className={`size-8 sm:size-10 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
+              <p className="text-sm sm:text-base font-bold text-muted-foreground">
                 {images.length >= MAX_IMAGES
                   ? "Maximum images reached"
                   : isDragging
                     ? "Drop images here"
                     : "Click to upload or drag & drop"}
               </p>
-              <p className="text-sm font-medium text-muted-foreground/70">
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground/70">
                 JPG, PNG, or WebP • Max 5MB • Up to {MAX_IMAGES} images
               </p>
             </label>
@@ -311,21 +311,21 @@ const PostProduce = () => {
 
           {/* Image Previews */}
           {preview.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-5">
               {preview.map((src, index) => (
                 <div key={src} className="group relative">
                   <img
                     src={src}
                     alt={`Preview ${index + 1}`}
-                    className="h-32 w-full rounded-2xl border object-cover"
+                    className="h-24 sm:h-32 w-full rounded-xl sm:rounded-2xl border object-cover"
                   />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute -right-2 -top-2 grid size-8 place-items-center rounded-full border-2 border-background bg-destructive text-destructive-foreground opacity-0 shadow-lg transition group-hover:opacity-100"
+                    className="absolute -right-1.5 sm:-right-2 -top-1.5 sm:-top-2 grid size-7 sm:size-8 place-items-center rounded-full border-2 border-background bg-destructive text-destructive-foreground opacity-0 shadow-lg transition group-hover:opacity-100"
                     aria-label={`Remove image ${index + 1}`}
                   >
-                    <X className="size-4" />
+                    <X className="size-3 sm:size-4" />
                   </button>
                 </div>
               ))}
@@ -333,8 +333,8 @@ const PostProduce = () => {
           )}
         </div>
 
-        <Button type="submit" variant="farm" size="touch" className="mt-2" disabled={isSubmitting}>
-          <PackagePlus className="size-7" />
+        <Button type="submit" variant="farm" size="touch" className="mt-2 h-14 sm:h-16 text-base sm:text-lg" disabled={isSubmitting}>
+          <PackagePlus className="size-6 sm:size-7" />
           {isSubmitting ? "Posting..." : "Post Now"}
         </Button>
       </form>
