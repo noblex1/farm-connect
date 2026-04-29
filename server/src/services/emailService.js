@@ -2,54 +2,70 @@ import nodemailer from "nodemailer";
 
 // Create transporter with improved configuration
 const createTransporter = () => {
-  // Use real SMTP if configured, regardless of environment
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    console.log("📧 Using configured SMTP:", process.env.SMTP_HOST);
-    console.log("📧 SMTP User:", process.env.SMTP_USER);
+  // Check if SMTP is configured
+  const hasSmtpConfig = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+  
+  if (!hasSmtpConfig) {
+    console.error("❌ SMTP Configuration Missing!");
+    console.error("Required environment variables:");
+    console.error("  - SMTP_HOST:", process.env.SMTP_HOST ? "✅" : "❌ MISSING");
+    console.error("  - SMTP_USER:", process.env.SMTP_USER ? "✅" : "❌ MISSING");
+    console.error("  - SMTP_PASS:", process.env.SMTP_PASS ? "✅ (hidden)" : "❌ MISSING");
+    console.error("  - SMTP_PORT:", process.env.SMTP_PORT || "587 (default)");
+    console.error("  - SMTP_FROM:", process.env.SMTP_FROM || process.env.SMTP_USER || "❌ MISSING");
     
-    return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      // Add timeout and connection settings
-      connectionTimeout: 10000, // 10 seconds
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
-      // Add pool settings for better performance
-      pool: true,
-      maxConnections: 5,
-      maxMessages: 100,
-      // Add TLS options
-      tls: {
-        rejectUnauthorized: true,
-        minVersion: 'TLSv1.2'
-      },
-      // Enable debug in development
-      debug: process.env.NODE_ENV !== "production",
-      logger: process.env.NODE_ENV !== "production",
-    });
+    // In production, throw error instead of returning mock
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("SMTP configuration is missing. Please configure SMTP environment variables in Render dashboard.");
+    }
+    
+    // Development fallback - logs to console
+    console.log("⚠️  Using mock email transporter for development");
+    return {
+      sendMail: async (mailOptions) => {
+        console.log("📧 [MOCK EMAIL] Would send to:", mailOptions.to);
+        console.log("📧 [MOCK EMAIL] Subject:", mailOptions.subject);
+        console.log("📧 [MOCK EMAIL] OTP would be in the email body");
+        return { 
+          messageId: "mock-" + Date.now(),
+          response: "250 Mock email logged"
+        };
+      }
+    };
   }
 
-  // Development fallback - logs to console
-  console.log("⚠️  SMTP not configured - emails will not be sent!");
-  console.log("⚠️  Set SMTP_HOST, SMTP_USER, and SMTP_PASS in .env file");
+  console.log("📧 SMTP Configuration:");
+  console.log("  - Host:", process.env.SMTP_HOST);
+  console.log("  - Port:", process.env.SMTP_PORT || "587");
+  console.log("  - User:", process.env.SMTP_USER);
+  console.log("  - From:", process.env.SMTP_FROM || process.env.SMTP_USER);
+  console.log("  - Secure:", process.env.SMTP_SECURE === "true" ? "Yes (465)" : "No (587)");
   
-  // Return a dummy transporter that logs instead of sending
-  return {
-    sendMail: async (mailOptions) => {
-      console.log("📧 [MOCK EMAIL] Would send to:", mailOptions.to);
-      console.log("📧 [MOCK EMAIL] Subject:", mailOptions.subject);
-      console.log("📧 [MOCK EMAIL] OTP would be in the email body");
-      return { 
-        messageId: "mock-" + Date.now(),
-        response: "250 Mock email logged"
-      };
-    }
-  };
+  return nodemailer.createTransporter({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    // Add timeout and connection settings
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+    // Add pool settings for better performance
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
+    // Add TLS options
+    tls: {
+      rejectUnauthorized: true,
+      minVersion: 'TLSv1.2'
+    },
+    // Enable debug in development
+    debug: process.env.NODE_ENV !== "production",
+    logger: process.env.NODE_ENV !== "production",
+  });
 };
 
 /**

@@ -9,6 +9,7 @@ import otpRoutes from "./routes/otpRoutes.js";
 import listingRoutes from "./routes/listingRoutes.js";
 import priceRoutes from "./routes/priceRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import diagnosticRoutes from "./routes/diagnosticRoutes.js";
 import { apiLimiter } from "./middlewares/rateLimiter.js";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 
@@ -65,6 +66,7 @@ app.use("/api/otp", otpRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/prices", priceRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/diagnostic", diagnosticRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
