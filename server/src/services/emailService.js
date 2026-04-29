@@ -2,10 +2,9 @@ import nodemailer from "nodemailer";
 
 // Create transporter
 const createTransporter = () => {
-  // For development, use ethereal email (fake SMTP)
-  // For production, use real SMTP service (Gmail, SendGrid, etc.)
-  
-  if (process.env.NODE_ENV === "production" && process.env.SMTP_HOST) {
+  // Use real SMTP if configured, regardless of environment
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    console.log("📧 Using configured SMTP:", process.env.SMTP_HOST);
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || "587"),
@@ -18,6 +17,7 @@ const createTransporter = () => {
   }
 
   // Development fallback - logs to console
+  console.log("📧 Using Ethereal (fake) email - SMTP not configured");
   return nodemailer.createTransport({
     host: "smtp.ethereal.email",
     port: 587,
