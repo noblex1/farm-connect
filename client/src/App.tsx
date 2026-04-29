@@ -26,6 +26,7 @@ import AdminUsers from "./pages/AdminUsers.tsx";
 import AdminListings from "./pages/AdminListings.tsx";
 import AdminPrices from "./pages/AdminPrices.tsx";
 import AdminAnalytics from "./pages/AdminAnalytics.tsx";
+import Settings from "./pages/Settings.tsx";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ const App = () => (
             {/* Shared Routes */}
             <Route element={<RequireAuth allowedRoles={["farmer", "buyer", "admin"]} />}>
               <Route path="profile" element={<UserProfile />} />
+              <Route path="settings" element={<Settings />} />
               <Route path="prices" element={<MarketPrices />} />
             </Route>
           </Route>

@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Home, LineChart, Package, ShoppingBasket, Sprout, UserRound } from "lucide-react";
+import { Home, LineChart, Package, ShoppingBasket, Sprout, UserRound, Settings } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { InstallPWA } from "@/components/InstallPWA";
 
@@ -10,6 +10,8 @@ const navItems = [
   { to: "/admin", label: "Admin", icon: LineChart, roles: ["admin"] },
   { to: "/prices", label: "Prices", icon: LineChart, roles: ["farmer", "buyer"] },
   { to: "/listings", label: "Mine", icon: Package, roles: ["farmer"] },
+  { to: "/profile", label: "Profile", icon: UserRound, roles: ["farmer", "buyer", "admin"] },
+  { to: "/settings", label: "Settings", icon: Settings, roles: ["farmer", "buyer", "admin"] },
 ];
 
 export const FarmShell = () => {
@@ -22,6 +24,20 @@ export const FarmShell = () => {
   const visibleNavItems = user?.role 
     ? navItems.filter(item => item.roles.includes(user.role))
     : navItems;
+
+  // Get main nav items (exclude Profile and Settings for desktop, include for mobile)
+  const mainNavItems = visibleNavItems.filter(item => 
+    !["Profile", "Settings"].includes(item.label)
+  );
+
+  // Get mobile nav items (limit to 5 most important)
+  const mobileNavItems = user?.role === "farmer"
+    ? visibleNavItems.filter(item => ["Home", "Farmer", "Mine", "Profile", "Settings"].includes(item.label))
+    : user?.role === "buyer"
+    ? visibleNavItems.filter(item => ["Home", "Buy", "Prices", "Profile", "Settings"].includes(item.label))
+    : user?.role === "admin"
+    ? visibleNavItems.filter(item => ["Home", "Admin", "Prices", "Profile", "Settings"].includes(item.label))
+    : visibleNavItems.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -57,19 +73,22 @@ export const FarmShell = () => {
       {/* PWA Install Prompt */}
       <InstallPWA />
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/98 safe-bottom shadow-soft md:hidden" aria-label="Main navigation">
-        <div className="grid grid-cols-5 px-1 pt-1.5 sm:pt-2">
-          {visibleNavItems.slice(0, 5).map(({ to, label, icon: Icon }) => (
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-surface-leaf safe-bottom shadow-soft md:hidden" aria-label="Main navigation">
+        <div className="grid grid-cols-5 px-1 pt-1.5 pb-1">
+          {mobileNavItems.slice(0, 5).map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex min-h-14 sm:min-h-16 flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-bold transition ${
-                  isActive ? "bg-surface-leaf text-primary" : "text-muted-foreground"
+                `flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-bold transition ${
+                  isActive 
+                    ? "bg-primary text-primary-foreground shadow-touch" 
+                    : "text-muted-foreground hover:bg-surface-warm"
                 }`
               }
             >
-              <Icon className="size-4 sm:size-5" aria-hidden="true" />
+              <Icon className="size-5" aria-hidden="true" />
               <span>{label}</span>
             </NavLink>
           ))}
