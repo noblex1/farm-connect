@@ -14,6 +14,7 @@
     "create:admin": "node scripts/create-admin.js"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
     "compression": "^1.8.1",
