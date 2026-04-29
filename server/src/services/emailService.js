@@ -2,6 +2,17 @@ import nodemailer from "nodemailer";
 
 // Create transporter with improved configuration
 const createTransporter = () => {
+  // Log all SMTP-related environment variables for debugging
+  console.log("=== SMTP Environment Variables Check ===");
+  console.log("SMTP_HOST:", process.env.SMTP_HOST || "❌ NOT SET");
+  console.log("SMTP_PORT:", process.env.SMTP_PORT || "❌ NOT SET");
+  console.log("SMTP_SECURE:", process.env.SMTP_SECURE || "❌ NOT SET");
+  console.log("SMTP_USER:", process.env.SMTP_USER || "❌ NOT SET");
+  console.log("SMTP_PASS:", process.env.SMTP_PASS ? "✅ SET (length: " + process.env.SMTP_PASS.length + ")" : "❌ NOT SET");
+  console.log("SMTP_FROM:", process.env.SMTP_FROM || process.env.SMTP_USER || "❌ NOT SET");
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("========================================");
+  
   // Check if SMTP is configured
   const hasSmtpConfig = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
   
@@ -16,7 +27,9 @@ const createTransporter = () => {
     
     // In production, throw error instead of returning mock
     if (process.env.NODE_ENV === "production") {
-      throw new Error("SMTP configuration is missing. Please configure SMTP environment variables in Render dashboard.");
+      const error = new Error("SMTP configuration is missing. Please configure SMTP environment variables in Render dashboard.");
+      error.statusCode = 503; // Service Unavailable
+      throw error;
     }
     
     // Development fallback - logs to console
@@ -34,38 +47,44 @@ const createTransporter = () => {
     };
   }
 
-  console.log("📧 SMTP Configuration:");
-  console.log("  - Host:", process.env.SMTP_HOST);
-  console.log("  - Port:", process.env.SMTP_PORT || "587");
-  console.log("  - User:", process.env.SMTP_USER);
-  console.log("  - From:", process.env.SMTP_FROM || process.env.SMTP_USER);
-  console.log("  - Secure:", process.env.SMTP_SECURE === "true" ? "Yes (465)" : "No (587)");
+  console.log("✅ SMTP Configuration Complete");
+  console.log("📧 Creating nodemailer transporter...");
   
-  return nodemailer.createTransporter({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    // Add timeout and connection settings
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-    // Add pool settings for better performance
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 100,
-    // Add TLS options
-    tls: {
-      rejectUnauthorized: true,
-      minVersion: 'TLSv1.2'
-    },
-    // Enable debug in development
-    debug: process.env.NODE_ENV !== "production",
-    logger: process.env.NODE_ENV !== "production",
-  });
+  try {
+    const transporter = nodemailer.createTransporter({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587"),
+      secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      // Add timeout and connection settings
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+      // Add pool settings for better performance
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      // Add TLS options
+      tls: {
+        rejectUnauthorized: true,
+        minVersion: 'TLSv1.2'
+      },
+      // Enable debug in development
+      debug: process.env.NODE_ENV !== "production",
+      logger: process.env.NODE_ENV !== "production",
+    });
+    
+    console.log("✅ Nodemailer transporter created successfully");
+    return transporter;
+  } catch (transporterError) {
+    console.error("❌ Failed to create nodemailer transporter:");
+    console.error("Error:", transporterError.message);
+    console.error("Stack:", transporterError.stack);
+    throw transporterError;
+  }
 };
 
 /**
