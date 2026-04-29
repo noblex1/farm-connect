@@ -25,12 +25,15 @@ import app from "./src/app.js";
 import connectDB from "./src/config/db.js";
 
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0'; // Bind to all interfaces for Render
 
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Farm Market API running on port ${PORT}`);
+    app.listen(PORT, HOST, () => {
+      console.log(`Farm Market API running on ${HOST}:${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV}`);
+      console.log(`Ready to accept connections`);
     });
   } catch (error) {
     console.error("Failed to start server:", error.message);
