@@ -1,10 +1,12 @@
 import nodemailer from "nodemailer";
 
-// Create transporter
+// Create transporter with improved configuration
 const createTransporter = () => {
   // Use real SMTP if configured, regardless of environment
   if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     console.log("📧 Using configured SMTP:", process.env.SMTP_HOST);
+    console.log("📧 SMTP User:", process.env.SMTP_USER);
+    
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || "587"),
@@ -13,20 +15,41 @@ const createTransporter = () => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      // Add timeout and connection settings
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+      // Add pool settings for better performance
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      // Add TLS options
+      tls: {
+        rejectUnauthorized: true,
+        minVersion: 'TLSv1.2'
+      },
+      // Enable debug in development
+      debug: process.env.NODE_ENV !== "production",
+      logger: process.env.NODE_ENV !== "production",
     });
   }
 
   // Development fallback - logs to console
-  console.log("📧 Using Ethereal (fake) email - SMTP not configured");
-  return nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER || "test@ethereal.email",
-      pass: process.env.SMTP_PASS || "test",
-    },
-  });
+  console.log("⚠️  SMTP not configured - emails will not be sent!");
+  console.log("⚠️  Set SMTP_HOST, SMTP_USER, and SMTP_PASS in .env file");
+  
+  // Return a dummy transporter that logs instead of sending
+  return {
+    sendMail: async (mailOptions) => {
+      console.log("📧 [MOCK EMAIL] Would send to:", mailOptions.to);
+      console.log("📧 [MOCK EMAIL] Subject:", mailOptions.subject);
+      console.log("📧 [MOCK EMAIL] OTP would be in the email body");
+      return { 
+        messageId: "mock-" + Date.now(),
+        response: "250 Mock email logged"
+      };
+    }
+  };
 };
 
 /**
@@ -34,45 +57,62 @@ const createTransporter = () => {
  */
 export const sendRegistrationOTP = async (email, otp, userName) => {
   try {
+    console.log(`📧 Attempting to send registration OTP to: ${email}`);
+    
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"Farm Market" <${process.env.SMTP_FROM || "noreply@farmmarket.com"}>`,
+      from: `"Farm Market" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@farmmarket.com"}>`,
       to: email,
-      subject: "Verify Your Farm Market Account",
+      subject: "Verify Your Farm Market Account - OTP Inside",
+      // Add headers to improve deliverability
+      headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'high',
+        'X-Mailer': 'Farm Market Platform'
+      },
       html: `
         <!DOCTYPE html>
         <html>
         <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background: #2D5F2E; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-            .otp-box { background: white; border: 2px solid #2D5F2E; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 20px 0; border-radius: 8px; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #ddd; }
+            .otp-box { background: white; border: 3px solid #2D5F2E; padding: 20px; text-align: center; font-size: 36px; font-weight: bold; letter-spacing: 10px; margin: 20px 0; border-radius: 8px; color: #2D5F2E; }
             .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-            .button { display: inline-block; padding: 12px 30px; background: #2D5F2E; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+            .highlight { color: #2D5F2E; font-weight: bold; }
+            @media only screen and (max-width: 600px) {
+              .otp-box { font-size: 28px; letter-spacing: 6px; }
+            }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>🌾 Farm Market</h1>
+              <h1 style="margin: 0;">🌾 Farm Market</h1>
+              <p style="margin: 5px 0 0 0;">Connecting Farmers & Buyers</p>
             </div>
             <div class="content">
-              <h2>Welcome, ${userName}!</h2>
-              <p>Thank you for registering with Farm Market. To complete your registration, please verify your email address using the OTP below:</p>
+              <h2 style="color: #2D5F2E;">Welcome, ${userName}!</h2>
+              <p>Thank you for registering with <strong>Farm Market</strong>. To complete your registration and verify your email address, please use the One-Time Password (OTP) below:</p>
               
               <div class="otp-box">${otp}</div>
               
-              <p><strong>This OTP will expire in 10 minutes.</strong></p>
+              <p><strong class="highlight">⏰ This OTP will expire in 10 minutes.</strong></p>
               
-              <p>If you didn't create an account with Farm Market, please ignore this email.</p>
+              <p style="margin-top: 20px;">If you didn't create an account with Farm Market, please ignore this email. Your email address will not be used without your confirmation.</p>
               
-              <p>Best regards,<br>The Farm Market Team</p>
+              <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+              
+              <p style="margin-bottom: 0;">Best regards,<br><strong>The Farm Market Team</strong></p>
             </div>
             <div class="footer">
-              <p>This is an automated email. Please do not reply.</p>
+              <p>This is an automated email. Please do not reply to this message.</p>
               <p>&copy; ${new Date().getFullYear()} Farm Market. All rights reserved.</p>
             </div>
           </div>
@@ -80,32 +120,58 @@ export const sendRegistrationOTP = async (email, otp, userName) => {
         </html>
       `,
       text: `
-        Welcome to Farm Market, ${userName}!
-        
-        Your verification OTP is: ${otp}
-        
-        This OTP will expire in 10 minutes.
-        
-        If you didn't create an account with Farm Market, please ignore this email.
-        
-        Best regards,
-        The Farm Market Team
+Farm Market - Email Verification
+
+Welcome, ${userName}!
+
+Thank you for registering with Farm Market. To complete your registration, please use the OTP below:
+
+Your OTP: ${otp}
+
+⏰ This OTP will expire in 10 minutes.
+
+If you didn't create an account with Farm Market, please ignore this email.
+
+Best regards,
+The Farm Market Team
+
+---
+This is an automated email. Please do not reply.
+© ${new Date().getFullYear()} Farm Market. All rights reserved.
       `,
     };
 
     const info = await transporter.sendMail(mailOptions);
     
-    console.log("✅ Registration OTP email sent:", info.messageId);
+    console.log("✅ Registration OTP email sent successfully!");
+    console.log("📧 Message ID:", info.messageId);
+    console.log("📧 Response:", info.response);
     
     // For development with ethereal, log preview URL
-    if (process.env.NODE_ENV !== "production") {
-      console.log("📧 Preview URL:", nodemailer.getTestMessageUrl(info));
+    if (process.env.NODE_ENV !== "production" && nodemailer.getTestMessageUrl) {
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      if (previewUrl) {
+        console.log("📧 Preview URL:", previewUrl);
+      }
     }
     
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("❌ Error sending registration OTP email:", error);
-    throw new Error("Failed to send verification email");
+    console.error("❌ Error sending registration OTP email:");
+    console.error("Error message:", error.message);
+    console.error("Error code:", error.code);
+    console.error("Full error:", error);
+    
+    // Provide more specific error messages
+    if (error.code === "EAUTH") {
+      throw new Error("Email authentication failed. Please check SMTP credentials.");
+    } else if (error.code === "ESOCKET" || error.code === "ETIMEDOUT") {
+      throw new Error("Cannot connect to email server. Please check your internet connection.");
+    } else if (error.code === "EENVELOPE") {
+      throw new Error("Invalid email address format.");
+    } else {
+      throw new Error("Failed to send verification email. Please try again later.");
+    }
   }
 };
 
@@ -114,48 +180,65 @@ export const sendRegistrationOTP = async (email, otp, userName) => {
  */
 export const sendPasswordResetOTP = async (email, otp, userName) => {
   try {
+    console.log(`📧 Attempting to send password reset OTP to: ${email}`);
+    
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"Farm Market" <${process.env.SMTP_FROM || "noreply@farmmarket.com"}>`,
+      from: `"Farm Market" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@farmmarket.com"}>`,
       to: email,
-      subject: "Reset Your Farm Market Password",
+      subject: "Reset Your Farm Market Password - OTP Inside",
+      headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'high',
+        'X-Mailer': 'Farm Market Platform'
+      },
       html: `
         <!DOCTYPE html>
         <html>
         <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background: #2D5F2E; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-            .otp-box { background: white; border: 2px solid #2D5F2E; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 20px 0; border-radius: 8px; }
-            .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #ddd; }
+            .otp-box { background: white; border: 3px solid #2D5F2E; padding: 20px; text-align: center; font-size: 36px; font-weight: bold; letter-spacing: 10px; margin: 20px 0; border-radius: 8px; color: #2D5F2E; }
+            .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px; }
             .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+            .highlight { color: #2D5F2E; font-weight: bold; }
+            @media only screen and (max-width: 600px) {
+              .otp-box { font-size: 28px; letter-spacing: 6px; }
+            }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>🌾 Farm Market</h1>
+              <h1 style="margin: 0;">🌾 Farm Market</h1>
+              <p style="margin: 5px 0 0 0;">Connecting Farmers & Buyers</p>
             </div>
             <div class="content">
-              <h2>Password Reset Request</h2>
-              <p>Hello ${userName},</p>
-              <p>We received a request to reset your Farm Market account password. Use the OTP below to proceed:</p>
+              <h2 style="color: #2D5F2E;">Password Reset Request</h2>
+              <p>Hello <strong>${userName}</strong>,</p>
+              <p>We received a request to reset your Farm Market account password. Use the One-Time Password (OTP) below to proceed:</p>
               
               <div class="otp-box">${otp}</div>
               
-              <p><strong>This OTP will expire in 10 minutes.</strong></p>
+              <p><strong class="highlight">⏰ This OTP will expire in 10 minutes.</strong></p>
               
               <div class="warning">
-                <strong>⚠️ Security Notice:</strong> If you didn't request a password reset, please ignore this email and ensure your account is secure.
+                <strong>⚠️ Security Notice:</strong> If you didn't request a password reset, please ignore this email and ensure your account is secure. Your password will not be changed without entering this OTP.
               </div>
               
-              <p>Best regards,<br>The Farm Market Team</p>
+              <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+              
+              <p style="margin-bottom: 0;">Best regards,<br><strong>The Farm Market Team</strong></p>
             </div>
             <div class="footer">
-              <p>This is an automated email. Please do not reply.</p>
+              <p>This is an automated email. Please do not reply to this message.</p>
               <p>&copy; ${new Date().getFullYear()} Farm Market. All rights reserved.</p>
             </div>
           </div>
@@ -163,34 +246,56 @@ export const sendPasswordResetOTP = async (email, otp, userName) => {
         </html>
       `,
       text: `
-        Password Reset Request - Farm Market
-        
-        Hello ${userName},
-        
-        We received a request to reset your password. Your OTP is: ${otp}
-        
-        This OTP will expire in 10 minutes.
-        
-        If you didn't request a password reset, please ignore this email.
-        
-        Best regards,
-        The Farm Market Team
+Farm Market - Password Reset Request
+
+Hello ${userName},
+
+We received a request to reset your password. Your OTP is: ${otp}
+
+⏰ This OTP will expire in 10 minutes.
+
+⚠️ Security Notice: If you didn't request a password reset, please ignore this email.
+
+Best regards,
+The Farm Market Team
+
+---
+This is an automated email. Please do not reply.
+© ${new Date().getFullYear()} Farm Market. All rights reserved.
       `,
     };
 
     const info = await transporter.sendMail(mailOptions);
     
-    console.log("✅ Password reset OTP email sent:", info.messageId);
+    console.log("✅ Password reset OTP email sent successfully!");
+    console.log("📧 Message ID:", info.messageId);
+    console.log("📧 Response:", info.response);
     
     // For development with ethereal, log preview URL
-    if (process.env.NODE_ENV !== "production") {
-      console.log("📧 Preview URL:", nodemailer.getTestMessageUrl(info));
+    if (process.env.NODE_ENV !== "production" && nodemailer.getTestMessageUrl) {
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      if (previewUrl) {
+        console.log("📧 Preview URL:", previewUrl);
+      }
     }
     
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("❌ Error sending password reset OTP email:", error);
-    throw new Error("Failed to send password reset email");
+    console.error("❌ Error sending password reset OTP email:");
+    console.error("Error message:", error.message);
+    console.error("Error code:", error.code);
+    console.error("Full error:", error);
+    
+    // Provide more specific error messages
+    if (error.code === "EAUTH") {
+      throw new Error("Email authentication failed. Please check SMTP credentials.");
+    } else if (error.code === "ESOCKET" || error.code === "ETIMEDOUT") {
+      throw new Error("Cannot connect to email server. Please check your internet connection.");
+    } else if (error.code === "EENVELOPE") {
+      throw new Error("Invalid email address format.");
+    } else {
+      throw new Error("Failed to send password reset email. Please try again later.");
+    }
   }
 };
 
