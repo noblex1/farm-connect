@@ -74,8 +74,18 @@ const createTransporter = () => {
 export const sendRegistrationOTP = async (email, otp, userName) => {
   try {
     console.log(`📧 Attempting to send registration OTP to: ${email}`);
+    console.log(`📧 OTP: ${otp}`);
+    console.log(`📧 User: ${userName}`);
     
-    const transporter = createTransporter();
+    // Create transporter (this might throw if SMTP not configured)
+    let transporter;
+    try {
+      transporter = createTransporter();
+    } catch (transporterError) {
+      console.error("❌ Failed to create email transporter:");
+      console.error("Error:", transporterError.message);
+      throw new Error("Email service is not configured. Please contact support.");
+    }
 
     const mailOptions = {
       from: `"Farm Market" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@farmmarket.com"}>`,
@@ -157,6 +167,11 @@ This is an automated email. Please do not reply.
       `,
     };
 
+    console.log("📧 Sending email with options:");
+    console.log("  From:", mailOptions.from);
+    console.log("  To:", mailOptions.to);
+    console.log("  Subject:", mailOptions.subject);
+
     const info = await transporter.sendMail(mailOptions);
     
     console.log("✅ Registration OTP email sent successfully!");
@@ -174,9 +189,10 @@ This is an automated email. Please do not reply.
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("❌ Error sending registration OTP email:");
+    console.error("Error name:", error.name);
     console.error("Error message:", error.message);
     console.error("Error code:", error.code);
-    console.error("Full error:", error);
+    console.error("Error stack:", error.stack);
     
     // Provide more specific error messages
     if (error.code === "EAUTH") {
@@ -185,6 +201,8 @@ This is an automated email. Please do not reply.
       throw new Error("Cannot connect to email server. Please check your internet connection.");
     } else if (error.code === "EENVELOPE") {
       throw new Error("Invalid email address format.");
+    } else if (error.message.includes("not configured")) {
+      throw error; // Re-throw configuration errors as-is
     } else {
       throw new Error("Failed to send verification email. Please try again later.");
     }
@@ -197,8 +215,18 @@ This is an automated email. Please do not reply.
 export const sendPasswordResetOTP = async (email, otp, userName) => {
   try {
     console.log(`📧 Attempting to send password reset OTP to: ${email}`);
+    console.log(`📧 OTP: ${otp}`);
+    console.log(`📧 User: ${userName}`);
     
-    const transporter = createTransporter();
+    // Create transporter (this might throw if SMTP not configured)
+    let transporter;
+    try {
+      transporter = createTransporter();
+    } catch (transporterError) {
+      console.error("❌ Failed to create email transporter:");
+      console.error("Error:", transporterError.message);
+      throw new Error("Email service is not configured. Please contact support.");
+    }
 
     const mailOptions = {
       from: `"Farm Market" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@farmmarket.com"}>`,
@@ -281,6 +309,11 @@ This is an automated email. Please do not reply.
       `,
     };
 
+    console.log("📧 Sending email with options:");
+    console.log("  From:", mailOptions.from);
+    console.log("  To:", mailOptions.to);
+    console.log("  Subject:", mailOptions.subject);
+
     const info = await transporter.sendMail(mailOptions);
     
     console.log("✅ Password reset OTP email sent successfully!");
@@ -298,9 +331,10 @@ This is an automated email. Please do not reply.
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("❌ Error sending password reset OTP email:");
+    console.error("Error name:", error.name);
     console.error("Error message:", error.message);
     console.error("Error code:", error.code);
-    console.error("Full error:", error);
+    console.error("Error stack:", error.stack);
     
     // Provide more specific error messages
     if (error.code === "EAUTH") {
@@ -309,6 +343,8 @@ This is an automated email. Please do not reply.
       throw new Error("Cannot connect to email server. Please check your internet connection.");
     } else if (error.code === "EENVELOPE") {
       throw new Error("Invalid email address format.");
+    } else if (error.message.includes("not configured")) {
+      throw error; // Re-throw configuration errors as-is
     } else {
       throw new Error("Failed to send password reset email. Please try again later.");
     }
