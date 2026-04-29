@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { LogIn, Mail, Lock, Sprout } from "lucide-react";
+import { LogIn, Mail, Lock, Sprout, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ const FarmerLogin = () => {
   const [searchParams] = useSearchParams();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const requestedRole = (searchParams.get("role") as UserRole | null) || "farmer";
   const nextPath = searchParams.get("next");
@@ -122,14 +123,33 @@ const FarmerLogin = () => {
           <span className="flex items-center gap-2">
             <Lock className="size-6 text-secondary" />Password
           </span>
-          <Input 
-            name="password" 
-            type="password"
-            required 
-            placeholder="Enter your password" 
-            className="min-h-16 rounded-2xl text-xl font-bold" 
-          />
+          <div className="relative">
+            <Input 
+              name="password" 
+              type={showPassword ? "text" : "password"}
+              required 
+              placeholder="Enter your password" 
+              className="min-h-16 rounded-2xl pr-14 text-xl font-bold" 
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="size-6" /> : <Eye className="size-6" />}
+            </button>
+          </div>
         </label>
+
+        <div className="flex justify-end">
+          <Link 
+            to="/forgot-password" 
+            className="text-sm font-bold text-primary hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         {error && <span className="text-base font-bold text-destructive">{error}</span>}
 

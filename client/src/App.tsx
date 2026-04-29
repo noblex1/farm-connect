@@ -9,6 +9,10 @@ import BuyerMarketplace from "./pages/BuyerMarketplace.tsx";
 import FarmerDashboard from "./pages/FarmerDashboard.tsx";
 import FarmerCreateAccount from "./pages/FarmerCreateAccount.tsx";
 import FarmerLogin from "./pages/FarmerLogin.tsx";
+import VerifyOTP from "./pages/VerifyOTP.tsx";
+import ForgotPassword from "./pages/ForgotPassword.tsx";
+import VerifyResetOTP from "./pages/VerifyResetOTP.tsx";
+import ResetPassword from "./pages/ResetPassword.tsx";
 import Index from "./pages/Index.tsx";
 import Landing from "./pages/Landing.tsx";
 import MarketPrices from "./pages/MarketPrices.tsx";
@@ -37,6 +41,10 @@ const App = () => (
             <Route path="home" element={<Landing />} />
             <Route path="login" element={<FarmerLogin />} />
             <Route path="create-account" element={<FarmerCreateAccount />} />
+            <Route path="verify-otp" element={<VerifyOTP />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="verify-reset-otp" element={<VerifyResetOTP />} />
+            <Route path="reset-password" element={<ResetPassword />} />
             <Route path="diagnostic" element={<DiagnosticProfile />} />
             
             {/* Buyer Routes */}

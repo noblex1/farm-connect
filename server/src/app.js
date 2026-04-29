@@ -5,6 +5,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 
 import authRoutes from "./routes/authRoutes.js";
+import otpRoutes from "./routes/otpRoutes.js";
 import listingRoutes from "./routes/listingRoutes.js";
 import priceRoutes from "./routes/priceRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -60,6 +61,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api", apiLimiter);
 app.use("/api/auth", authRoutes);
+app.use("/api/otp", otpRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/prices", priceRoutes);
 app.use("/api/admin", adminRoutes);

@@ -1,6 +1,60 @@
 import { apiRequest } from "./apiClient";
 import type { AuthResponse, CurrentUserResponse, ListingsResponse, MarketPricesResponse } from "@/types/api";
 
+// OTP Registration
+export const registerWithOTP = (payload: {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  role: "farmer" | "buyer";
+  location: string;
+}) =>
+  apiRequest<{ message: string; email: string; requiresVerification: boolean }>("/otp/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const verifyRegistrationOTP = (payload: {
+  email: string;
+  otp: string;
+  name: string;
+  phoneNumber: string;
+  password: string;
+  role: string;
+  location: string;
+}) =>
+  apiRequest<AuthResponse>("/otp/verify-registration", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const resendRegistrationOTP = (payload: { email: string; name?: string }) =>
+  apiRequest<{ message: string }>("/otp/resend-registration-otp", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+// Password Reset
+export const requestPasswordReset = (payload: { email: string }) =>
+  apiRequest<{ message: string; email: string }>("/otp/forgot-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const verifyPasswordResetOTP = (payload: { email: string; otp: string }) =>
+  apiRequest<{ message: string; resetToken: string }>("/otp/verify-reset-otp", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const resetPassword = (payload: { email: string; resetToken: string; newPassword: string }) =>
+  apiRequest<{ message: string }>("/otp/reset-password", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+// Regular Auth (keep for backward compatibility)
 export const registerUser = (payload: {
   name: string;
   email: string;

@@ -70,3 +70,49 @@ export const updateProfileValidation = [
     .matches(/^\+?[0-9]{9,15}$/)
     .withMessage("whatsappNumber must be valid"),
 ];
+
+// OTP validation rules
+export const registerOTPValidation = [
+  body("name").trim().isLength({ min: 2, max: 80 }).withMessage("name must be 2-80 chars"),
+  body("email").trim().isEmail().withMessage("valid email is required"),
+  body("phoneNumber")
+    .trim()
+    .matches(/^\+?[0-9]{9,15}$/)
+    .withMessage("phoneNumber must be a valid mobile number"),
+  body("password").isLength({ min: 6 }).withMessage("password must be at least 6 characters"),
+  body("role").isIn(roles).withMessage("role must be farmer or buyer"),
+  body("location").trim().isLength({ min: 2, max: 80 }).withMessage("location is required"),
+];
+
+export const verifyOTPValidation = [
+  body("email").trim().isEmail().withMessage("valid email is required"),
+  body("otp").trim().isLength({ min: 6, max: 6 }).withMessage("OTP must be 6 digits"),
+  body("name").trim().isLength({ min: 2, max: 80 }).withMessage("name must be 2-80 chars"),
+  body("phoneNumber")
+    .trim()
+    .matches(/^\+?[0-9]{9,15}$/)
+    .withMessage("phoneNumber must be a valid mobile number"),
+  body("password").isLength({ min: 6 }).withMessage("password must be at least 6 characters"),
+  body("role").isIn(roles).withMessage("role must be farmer or buyer"),
+  body("location").trim().isLength({ min: 2, max: 80 }).withMessage("location is required"),
+];
+
+export const resendOTPValidation = [
+  body("email").trim().isEmail().withMessage("valid email is required"),
+  body("name").optional().trim().isLength({ min: 2, max: 80 }).withMessage("name must be 2-80 chars"),
+];
+
+export const requestPasswordResetValidation = [
+  body("email").trim().isEmail().withMessage("valid email is required"),
+];
+
+export const verifyPasswordResetOTPValidation = [
+  body("email").trim().isEmail().withMessage("valid email is required"),
+  body("otp").trim().isLength({ min: 6, max: 6 }).withMessage("OTP must be 6 digits"),
+];
+
+export const resetPasswordValidation = [
+  body("email").trim().isEmail().withMessage("valid email is required"),
+  body("resetToken").trim().notEmpty().withMessage("reset token is required"),
+  body("newPassword").isLength({ min: 6 }).withMessage("password must be at least 6 characters"),
+];

@@ -1,11 +1,10 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle2, Mail, MapPin, Phone, Sprout, UserRound, Lock } from "lucide-react";
+import { CheckCircle2, Mail, MapPin, Phone, Sprout, Lock, Eye, EyeOff, UserRound } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { registerUser } from "@/services/marketApi";
-import { sessionStore } from "@/lib/session";
+import { registerWithOTP } from "@/services/marketApi";
 import { useToast } from "@/hooks/use-toast";
 import { RoleBasedRedirect } from "@/components/auth/RoleBasedRedirect";
 import type { UserRole } from "@/types/api";
@@ -25,8 +24,8 @@ const FarmerCreateAccount = () => {
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<Partial<Record<keyof FarmerAccount, string>>>({});
   const [submitError, setSubmitError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const requestedRole = (searchParams.get("role") as UserRole | null) || "farmer";
   const roleLabel = requestedRole === "buyer" ? "Buyer" : "Farmer";
@@ -48,7 +47,6 @@ const FarmerCreateAccount = () => {
     const parsed = farmerAccountSchema.safeParse(values);
 
     if (!parsed.success) {
-      setSuccess(false);
       const fieldErrors = parsed.error.flatten().fieldErrors;
       setErrors({
         name: fieldErrors.name?.[0],
@@ -62,7 +60,7 @@ const FarmerCreateAccount = () => {
     }
 
     try {
-      const response = await registerUser({
+      await registerWithOTP({
         name: parsed.data.name,
         email: parsed.data.email,
         phoneNumber: parsed.data.phone,
@@ -71,39 +69,26 @@ const FarmerCreateAccount = () => {
         role: requestedRole === "buyer" ? "buyer" : "farmer",
       });
 
-      sessionStore.setToken(response.token);
-      sessionStore.setUser(response.user);
-      localStorage.setItem(
-        "farm-market-farmer-profile",
-        JSON.stringify({
-          name: response.user.name,
-          phone: response.user.phoneNumber,
-          whatsapp: response.user.phoneNumber,
-          email: response.user.email,
-        })
-      );
-
       setErrors({});
-      setSuccess(true);
 
-      // Show success toast
       toast({
-        title: "Account created successfully!",
-        description: `Welcome to Farm Market, ${response.user.name.split(" ")[0]}!`,
+        title: "OTP sent!",
+        description: "Check your email for the verification code.",
       });
 
-      // Role-based redirect
-      const roleRoutes: Record<string, string> = {
-        farmer: "/farmer",
-        buyer: "/buyer",
-        admin: "/prices",
-      };
-
-      const targetRoute = roleRoutes[response.user.role] || "/farmer";
-      window.setTimeout(() => navigate(targetRoute, { replace: true }), 650);
+      // Navigate to OTP verification page with registration data
+      const params = new URLSearchParams({
+        email: parsed.data.email,
+        name: parsed.data.name,
+        phone: parsed.data.phone,
+        password: parsed.data.password,
+        location: parsed.data.location,
+        role: requestedRole === "buyer" ? "buyer" : "farmer",
+      });
+      
+      navigate(`/verify-otp?${params.toString()}`, { replace: true });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Could not create account. Please try again.");
-      setSuccess(false);
       setIsLoading(false);
     }
   };
@@ -118,15 +103,6 @@ const FarmerCreateAccount = () => {
         <h1 className="text-4xl font-black">Create {roleLabel} Account</h1>
         <p className="mt-2 text-xl font-bold text-muted-foreground">{roleLabel} onboarding</p>
       </header>
-
-      {success && (
-        <div
-          className="mb-5 flex items-center gap-3 rounded-3xl border bg-surface-leaf p-4 text-xl font-black text-primary shadow-touch"
-          role="status"
-        >
-          <CheckCircle2 className="size-8" aria-hidden="true" />Account created
-        </div>
-      )}
 
       {submitError && <div className="mb-5 rounded-3xl border border-destructive bg-card p-4 font-bold text-destructive">{submitError}</div>}
 
@@ -159,7 +135,23 @@ const FarmerCreateAccount = () => {
           <span className="flex items-center gap-2">
             <Lock className="size-6 text-primary" />Password
           </span>
-          <Input name="password" type="password" required placeholder="At least 6 characters" className="min-h-16 rounded-2xl text-xl font-bold" />
+          <div className="relative">
+            <Input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              placeholder="At least 6 characters"
+              className="min-h-16 rounded-2xl pr-14 text-xl font-bold"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="size-6" /> : <Eye className="size-6" />}
+            </button>
+          </div>
           {errors.password && <span className="text-base font-bold text-destructive">{errors.password}</span>}
         </label>
 
@@ -171,8 +163,8 @@ const FarmerCreateAccount = () => {
           {errors.location && <span className="text-base font-bold text-destructive">{errors.location}</span>}
         </label>
 
-        <Button type="submit" variant="farm" size="touch" className="mt-2" disabled={isLoading || success}>
-          <Sprout className="size-7" />{isLoading ? "Creating Account..." : success ? "Account Created!" : "Create Account"}
+        <Button type="submit" variant="farm" size="touch" className="mt-2" disabled={isLoading}>
+          <Sprout className="size-7" />{isLoading ? "Creating Account..." : "Create Account"}
         </Button>
         <Button asChild variant="outline" size="touch">
           <Link to={`/login?role=${requestedRole}`}>Login instead</Link>
