@@ -1,7 +1,8 @@
-import nodemailer from "nodemailer";
+import pkg from "nodemailer";
+const { createTransport, getTestMessageUrl } = pkg;
 
 // Create transporter with improved configuration
-const createTransporter = () => {
+const createEmailTransporter = () => {
   // Log all SMTP-related environment variables for debugging
   console.log("=== SMTP Environment Variables Check ===");
   console.log("SMTP_HOST:", process.env.SMTP_HOST || "❌ NOT SET");
@@ -51,7 +52,8 @@ const createTransporter = () => {
   console.log("📧 Creating nodemailer transporter...");
   
   try {
-    const transporter = nodemailer.createTransporter({
+    // Use createTransport from destructured import
+    const transporter = createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || "587"),
       secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
@@ -99,7 +101,7 @@ export const sendRegistrationOTP = async (email, otp, userName) => {
     // Create transporter (this might throw if SMTP not configured)
     let transporter;
     try {
-      transporter = createTransporter();
+      transporter = createEmailTransporter();
     } catch (transporterError) {
       console.error("❌ Failed to create email transporter:");
       console.error("Error:", transporterError.message);
@@ -198,8 +200,8 @@ This is an automated email. Please do not reply.
     console.log("📧 Response:", info.response);
     
     // For development with ethereal, log preview URL
-    if (process.env.NODE_ENV !== "production" && nodemailer.getTestMessageUrl) {
-      const previewUrl = nodemailer.getTestMessageUrl(info);
+    if (process.env.NODE_ENV !== "production" && getTestMessageUrl) {
+      const previewUrl = getTestMessageUrl(info);
       if (previewUrl) {
         console.log("📧 Preview URL:", previewUrl);
       }
@@ -240,7 +242,7 @@ export const sendPasswordResetOTP = async (email, otp, userName) => {
     // Create transporter (this might throw if SMTP not configured)
     let transporter;
     try {
-      transporter = createTransporter();
+      transporter = createEmailTransporter();
     } catch (transporterError) {
       console.error("❌ Failed to create email transporter:");
       console.error("Error:", transporterError.message);
@@ -340,8 +342,8 @@ This is an automated email. Please do not reply.
     console.log("📧 Response:", info.response);
     
     // For development with ethereal, log preview URL
-    if (process.env.NODE_ENV !== "production" && nodemailer.getTestMessageUrl) {
-      const previewUrl = nodemailer.getTestMessageUrl(info);
+    if (process.env.NODE_ENV !== "production" && getTestMessageUrl) {
+      const previewUrl = getTestMessageUrl(info);
       if (previewUrl) {
         console.log("📧 Preview URL:", previewUrl);
       }
