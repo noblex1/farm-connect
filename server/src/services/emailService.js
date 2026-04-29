@@ -1,5 +1,4 @@
-import pkg from "nodemailer";
-const { createTransport, getTestMessageUrl } = pkg;
+import nodemailer from "nodemailer";
 
 // Create transporter with improved configuration
 const createEmailTransporter = () => {
@@ -52,8 +51,8 @@ const createEmailTransporter = () => {
   console.log("📧 Creating nodemailer transporter...");
   
   try {
-    // Use createTransport from destructured import
-    const transporter = createTransport({
+    // Use nodemailer.createTransport
+    const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || "587"),
       secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
@@ -200,8 +199,8 @@ This is an automated email. Please do not reply.
     console.log("📧 Response:", info.response);
     
     // For development with ethereal, log preview URL
-    if (process.env.NODE_ENV !== "production" && getTestMessageUrl) {
-      const previewUrl = getTestMessageUrl(info);
+    if (process.env.NODE_ENV !== "production" && nodemailer.getTestMessageUrl) {
+      const previewUrl = nodemailer.getTestMessageUrl(info);
       if (previewUrl) {
         console.log("📧 Preview URL:", previewUrl);
       }
@@ -342,8 +341,8 @@ This is an automated email. Please do not reply.
     console.log("📧 Response:", info.response);
     
     // For development with ethereal, log preview URL
-    if (process.env.NODE_ENV !== "production" && getTestMessageUrl) {
-      const previewUrl = getTestMessageUrl(info);
+    if (process.env.NODE_ENV !== "production" && nodemailer.getTestMessageUrl) {
+      const previewUrl = nodemailer.getTestMessageUrl(info);
       if (previewUrl) {
         console.log("📧 Preview URL:", previewUrl);
       }
