@@ -52,6 +52,10 @@ export const registerWithOTP = asyncHandler(async (req, res) => {
   const otp = generateOTP();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+  console.log("📧 Generated OTP for registration:", otp);
+  console.log("📧 Sending to email:", normalizedEmail);
+  console.log("📧 User name:", name.trim());
+
   // Store OTP in database
   await OTP.create({
     email: normalizedEmail,
@@ -60,16 +64,14 @@ export const registerWithOTP = asyncHandler(async (req, res) => {
     expiresAt,
   });
 
-  // Send OTP email
-  try {
-    await sendRegistrationOTP(normalizedEmail, otp, name.trim());
-  } catch (emailError) {
-    console.error("Email sending failed:", emailError);
-    // Continue even if email fails - user can request resend
-  }
+  console.log("✅ OTP stored in database");
 
-  // Store user data temporarily in session (we'll create user after OTP verification)
-  // For now, return success without creating user
+  // Send OTP email - DO NOT catch errors, let them propagate
+  console.log("📧 Attempting to send registration OTP email...");
+  await sendRegistrationOTP(normalizedEmail, otp, name.trim());
+  console.log("✅ Registration OTP email sent successfully!");
+
+  // Return success
   res.status(200).json({
     message: "OTP sent to your email. Please verify to complete registration.",
     email: normalizedEmail,
@@ -146,6 +148,9 @@ export const resendRegistrationOTP = asyncHandler(async (req, res) => {
   const otp = generateOTP();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
+  console.log("📧 Generated new OTP for resend:", otp);
+  console.log("📧 Sending to email:", normalizedEmail);
+
   await OTP.create({
     email: normalizedEmail,
     otp,
@@ -154,7 +159,9 @@ export const resendRegistrationOTP = asyncHandler(async (req, res) => {
   });
 
   // Send OTP email
+  console.log("📧 Attempting to resend registration OTP email...");
   await sendRegistrationOTP(normalizedEmail, otp, name || "User");
+  console.log("✅ Registration OTP email resent successfully!");
 
   res.status(200).json({
     message: "New OTP sent to your email.",
@@ -186,6 +193,10 @@ export const requestPasswordReset = asyncHandler(async (req, res) => {
   const otp = generateOTP();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
+  console.log("📧 Generated OTP for password reset:", otp);
+  console.log("📧 Sending to email:", normalizedEmail);
+  console.log("📧 User name:", user.name);
+
   await OTP.create({
     email: normalizedEmail,
     otp,
@@ -194,11 +205,9 @@ export const requestPasswordReset = asyncHandler(async (req, res) => {
   });
 
   // Send OTP email
-  try {
-    await sendPasswordResetOTP(normalizedEmail, otp, user.name);
-  } catch (emailError) {
-    console.error("Email sending failed:", emailError);
-  }
+  console.log("📧 Attempting to send password reset OTP email...");
+  await sendPasswordResetOTP(normalizedEmail, otp, user.name);
+  console.log("✅ Password reset OTP email sent successfully!");
 
   res.status(200).json({
     message: "If an account exists with this email, you will receive a password reset OTP.",
