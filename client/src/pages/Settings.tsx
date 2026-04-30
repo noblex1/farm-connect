@@ -1,14 +1,17 @@
-import { Bell, Globe, Lock, Moon, Palette, Shield, Smartphone, User } from "lucide-react";
+import { Bell, Globe, Lock, Moon, Palette, Shield, Smartphone, User, Sun } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/LogoutButton";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Settings = () => {
   const { data, isLoading } = useCurrentUser();
+  const { theme, toggleTheme } = useTheme();
   const user = data?.user;
+  const isDarkMode = theme === "dark";
 
   if (isLoading) {
     return (
@@ -113,13 +116,19 @@ const Settings = () => {
           <CardContent className="p-4 pt-0 sm:p-5 sm:pt-0 md:p-6 md:pt-0 space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-surface-leaf">
               <div className="flex items-center gap-2 sm:gap-3 flex-1">
-                <Moon className="size-5 sm:size-6 text-primary" />
+                {isDarkMode ? (
+                  <Moon className="size-5 sm:size-6 text-primary" />
+                ) : (
+                  <Sun className="size-5 sm:size-6 text-primary" />
+                )}
                 <div>
                   <p className="text-sm sm:text-base font-bold">Dark Mode</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Enable dark theme</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {isDarkMode ? "Dark theme enabled" : "Light theme enabled"}
+                  </p>
                 </div>
               </div>
-              <Switch />
+              <Switch checked={isDarkMode} onCheckedChange={toggleTheme} />
             </div>
             <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-surface-leaf">
               <div className="flex items-center gap-2 sm:gap-3 flex-1">
