@@ -1,11 +1,10 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Home, LineChart, Package, ShoppingBasket, Sprout, UserRound, Settings } from "lucide-react";
+import { LineChart, Package, ShoppingBasket, Sprout, UserRound, Settings } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { InstallPWA } from "@/components/InstallPWA";
 import { sessionStore } from "@/lib/session";
 
 const navItems = [
-  { to: "/", label: "Home", icon: Home, roles: ["farmer", "buyer", "admin"] },
   { to: "/buyer", label: "Buy", icon: ShoppingBasket, roles: ["buyer"] },
   { to: "/farmer", label: "Farmer", icon: Sprout, roles: ["farmer"] },
   { to: "/admin", label: "Admin", icon: LineChart, roles: ["admin"] },
@@ -29,11 +28,11 @@ export const FarmShell = () => {
 
   // Get mobile nav items (limit to 5 most important)
   const mobileNavItems = user?.role === "farmer"
-    ? visibleNavItems.filter(item => ["Home", "Farmer", "Mine", "Profile", "Settings"].includes(item.label))
+    ? visibleNavItems.filter(item => ["Farmer", "Mine", "Prices", "Profile", "Settings"].includes(item.label))
     : user?.role === "buyer"
-    ? visibleNavItems.filter(item => ["Home", "Buy", "Prices", "Profile", "Settings"].includes(item.label))
+    ? visibleNavItems.filter(item => ["Buy", "Prices", "Profile", "Settings"].includes(item.label))
     : user?.role === "admin"
-    ? visibleNavItems.filter(item => ["Home", "Admin", "Prices", "Profile", "Settings"].includes(item.label))
+    ? visibleNavItems.filter(item => ["Admin", "Prices", "Profile", "Settings"].includes(item.label))
     : visibleNavItems.slice(0, 5);
 
   return (
