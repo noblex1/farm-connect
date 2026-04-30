@@ -74,11 +74,19 @@ const createEmailTransporter = () => {
   console.log("📧 Creating nodemailer transporter...");
   
   try {
+    const port = parseInt(process.env.SMTP_PORT || "587", 10);
+    const secure = process.env.SMTP_SECURE === "true";
+    // Gmail and most providers on 587 use STARTTLS; this avoids silent plain-text or odd TLS handshakes.
+    const requireTLS =
+      process.env.SMTP_REQUIRE_TLS === "true" ||
+      (process.env.SMTP_REQUIRE_TLS !== "false" && !secure && port === 587);
+
     // Use nodemailer.createTransport
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
+      port,
+      secure, // true for 465, false for 587 STARTTLS
+      requireTLS,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,

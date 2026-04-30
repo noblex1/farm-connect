@@ -62,10 +62,17 @@ console.log("✅ All required environment variables are set!\n");
 // Test SMTP connection
 console.log("2️⃣ Testing SMTP Connection...\n");
 
+const smtpPort = parseInt(process.env.SMTP_PORT || "587", 10);
+const smtpSecure = process.env.SMTP_SECURE === "true";
+const requireTLS =
+  process.env.SMTP_REQUIRE_TLS === "true" ||
+  (process.env.SMTP_REQUIRE_TLS !== "false" && !smtpSecure && smtpPort === 587);
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: process.env.SMTP_SECURE === "true",
+  port: smtpPort,
+  secure: smtpSecure,
+  requireTLS,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
