@@ -21,7 +21,7 @@ const Settings = () => {
   }
 
   return (
-    <section className="animate-gentle-rise">
+    <section className="animate-gentle-rise pb-4 sm:pb-6">
       <header className="mb-4 sm:mb-5">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-black">Settings</h1>
         <p className="mt-1 sm:mt-2 text-base sm:text-lg md:text-xl font-bold text-muted-foreground">
@@ -205,7 +205,11 @@ const Settings = () => {
         {/* Logout */}
         <Card className="rounded-2xl sm:rounded-3xl border-2 border-destructive/20 shadow-touch">
           <CardContent className="p-4 sm:p-5 md:p-6">
-            <LogoutButton />
+            <LogoutButton 
+              variant="destructive" 
+              size="touch" 
+              className="w-full text-base sm:text-lg font-bold"
+            />
           </CardContent>
         </Card>
       </div>

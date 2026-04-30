@@ -79,7 +79,7 @@ export const FarmShell = () => {
         </div>
       </header>
 
-      <main className={`mx-auto max-w-5xl px-3 sm:px-4 pt-3 sm:pt-4 ${isLoggedIn ? "pb-5 sm:pb-6 md:pb-8" : "pb-24 sm:pb-28 md:pb-8"}`}>
+      <main className={`mx-auto max-w-5xl px-3 sm:px-4 pt-3 sm:pt-4 ${isLoggedIn ? "pb-20 sm:pb-24 md:pb-8" : "pb-24 sm:pb-28 md:pb-8"}`}>
         <Outlet />
       </main>
 
