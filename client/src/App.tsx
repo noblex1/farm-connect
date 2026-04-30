@@ -29,6 +29,7 @@ import AdminPrices from "./pages/AdminPrices.tsx";
 import AdminAnalytics from "./pages/AdminAnalytics.tsx";
 import Settings from "./pages/Settings.tsx";
 import Favorites from "./pages/Favorites.tsx";
+import ChangePassword from "./pages/ChangePassword.tsx";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
               <Route element={<RequireAuth allowedRoles={["farmer", "buyer", "admin"]} />}>
                 <Route path="profile" element={<UserProfile />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="change-password" element={<ChangePassword />} />
                 <Route path="prices" element={<MarketPrices />} />
               </Route>
             </Route>
