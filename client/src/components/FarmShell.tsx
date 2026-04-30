@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { LineChart, Package, ShoppingBasket, Sprout, UserRound, Settings } from "lucide-react";
+import { LineChart, Package, ShoppingBasket, Sprout, UserRound, Settings, Heart } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { InstallPWA } from "@/components/InstallPWA";
 import { sessionStore } from "@/lib/session";
@@ -9,6 +9,7 @@ const navItems = [
   { to: "/farmer", label: "Farmer", icon: Sprout, roles: ["farmer"] },
   { to: "/admin", label: "Admin", icon: LineChart, roles: ["admin"] },
   { to: "/prices", label: "Prices", icon: LineChart, roles: ["farmer", "buyer"] },
+  { to: "/favorites", label: "Saved", icon: Heart, roles: ["buyer"] },
   { to: "/listings", label: "Mine", icon: Package, roles: ["farmer"] },
   { to: "/profile", label: "Profile", icon: UserRound, roles: ["farmer", "buyer", "admin"] },
   { to: "/settings", label: "Settings", icon: Settings, roles: ["farmer", "buyer", "admin"] },
@@ -30,7 +31,7 @@ export const FarmShell = () => {
   const mobileNavItems = user?.role === "farmer"
     ? visibleNavItems.filter(item => ["Farmer", "Mine", "Prices", "Profile", "Settings"].includes(item.label))
     : user?.role === "buyer"
-    ? visibleNavItems.filter(item => ["Buy", "Prices", "Profile", "Settings"].includes(item.label))
+    ? visibleNavItems.filter(item => ["Buy", "Saved", "Prices", "Profile", "Settings"].includes(item.label))
     : user?.role === "admin"
     ? visibleNavItems.filter(item => ["Admin", "Prices", "Profile", "Settings"].includes(item.label))
     : visibleNavItems.slice(0, 5);

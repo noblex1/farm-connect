@@ -27,6 +27,7 @@ import AdminListings from "./pages/AdminListings.tsx";
 import AdminPrices from "./pages/AdminPrices.tsx";
 import AdminAnalytics from "./pages/AdminAnalytics.tsx";
 import Settings from "./pages/Settings.tsx";
+import Favorites from "./pages/Favorites.tsx";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
             <Route element={<RequireAuth allowedRoles={["buyer"]} />}>
               <Route path="buyer" element={<BuyerMarketplace />} />
               <Route path="marketplace" element={<BuyerMarketplace />} />
+              <Route path="favorites" element={<Favorites />} />
             </Route>
             
             {/* Farmer Routes */}
