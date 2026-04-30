@@ -390,11 +390,22 @@ const NewLanding = () => {
             </div>
 
             <div className="relative">
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/20 p-8 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-9xl mb-4">🌾</div>
-                  <p className="text-2xl font-black">Empowering Farmers</p>
-                  <p className="text-lg text-muted-foreground">One Connection at a Time</p>
+              <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
+                {/* Background Image */}
+                <img 
+                  src="/farmers.jpg" 
+                  alt="Ghana Farmers" 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                
+                {/* Gradient Overlay for better text visibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent" />
+                
+                {/* Content */}
+                <div className="relative h-full flex flex-col items-center justify-end p-8 text-center">
+                  <div className="text-7xl sm:text-8xl mb-4">🌾</div>
+                  <p className="text-2xl sm:text-3xl font-black text-white drop-shadow-lg">Empowering Farmers</p>
+                  <p className="text-lg sm:text-xl text-white/90 drop-shadow-md">One Connection at a Time</p>
                 </div>
               </div>
             </div>
