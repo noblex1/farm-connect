@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { LogIn, Mail, Lock, Sprout, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { loginUser } from "@/services/marketApi";
@@ -17,6 +18,7 @@ const loginSchema = z.object({
 
 const FarmerLogin = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -71,6 +73,10 @@ const FarmerLogin = () => {
         })
       );
 
+      // Invalidate and refetch user query to update UI immediately
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.setQueryData(["currentUser", response.token], { user: response.user });
+
       // Role-based redirect
       const roleRoutes: Record<string, string> = {
         farmer: "/farmer",
@@ -88,7 +94,11 @@ const FarmerLogin = () => {
         description: `Welcome back, ${response.user.name.split(" ")[0]}!`,
       });
 
+      // Use replace to prevent back button issues
       navigate(targetRoute, { replace: true });
+      
+      // Force a page reload to ensure all components re-render with new auth state
+      window.location.href = targetRoute;
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Login failed. Please try again.");
       setIsLoading(false);
@@ -98,16 +108,16 @@ const FarmerLogin = () => {
   return (
     <section className="animate-gentle-rise">
       <RoleBasedRedirect />
-      <header className="mb-5 rounded-3xl bg-surface-leaf p-5 shadow-touch">
-        <div className="mb-3 grid size-16 place-items-center rounded-2xl bg-card text-4xl shadow-touch" aria-hidden="true">
+      <header className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl bg-surface-leaf p-4 sm:p-5 shadow-touch">
+        <div className="mb-3 grid size-14 sm:size-16 place-items-center rounded-2xl bg-card text-3xl sm:text-4xl shadow-touch" aria-hidden="true">
           🌾
         </div>
-        <h1 className="text-4xl font-black">{roleLabel} Login</h1>
-        <p className="mt-2 text-xl font-bold text-muted-foreground">Sign in to your account</p>
+        <h1 className="text-2xl sm:text-4xl font-black">{roleLabel} Login</h1>
+        <p className="mt-1.5 sm:mt-2 text-base sm:text-xl font-bold text-muted-foreground">Sign in to your account</p>
       </header>
 
-      <form onSubmit={onSubmit} className="grid gap-4 rounded-3xl border bg-card p-4 shadow-touch md:p-6">
-        <label className="grid gap-2 text-lg font-black">
+      <form onSubmit={onSubmit} className="grid gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 md:p-6 shadow-touch">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Mail className="size-6 text-secondary" />Email or Phone Number
           </span>
@@ -115,11 +125,11 @@ const FarmerLogin = () => {
             name="emailOrPhone" 
             required 
             placeholder="email@example.com or +233201234567" 
-            className="min-h-16 rounded-2xl text-xl font-bold" 
+            className="min-h-14 sm:min-h-16 rounded-2xl text-base sm:text-xl font-bold"
           />
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Lock className="size-6 text-secondary" />Password
           </span>
@@ -129,7 +139,7 @@ const FarmerLogin = () => {
               type={showPassword ? "text" : "password"}
               required 
               placeholder="Enter your password" 
-              className="min-h-16 rounded-2xl pr-14 text-xl font-bold" 
+              className="min-h-14 sm:min-h-16 rounded-2xl pr-14 text-base sm:text-xl font-bold"
             />
             <button
               type="button"

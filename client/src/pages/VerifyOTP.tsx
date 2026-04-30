@@ -1,6 +1,7 @@
 import { FormEvent, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Mail, RefreshCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { verifyRegistrationOTP, resendRegistrationOTP } from "@/services/marketApi";
@@ -9,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -76,6 +78,10 @@ const VerifyOTP = () => {
         })
       );
 
+      // Invalidate and refetch user query to update UI immediately
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.setQueryData(["currentUser", response.token], { user: response.user });
+
       toast({
         title: "Account verified!",
         description: `Welcome to Farm Market, ${response.user.name.split(" ")[0]}!`,
@@ -89,7 +95,9 @@ const VerifyOTP = () => {
       };
 
       const targetRoute = roleRoutes[response.user.role] || "/farmer";
-      navigate(targetRoute, { replace: true });
+      
+      // Force a page reload to ensure all components re-render with new auth state
+      window.location.href = targetRoute;
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Verification failed. Please try again.");
       setIsLoading(false);
@@ -118,18 +126,18 @@ const VerifyOTP = () => {
 
   return (
     <section className="animate-gentle-rise">
-      <header className="mb-5 rounded-3xl bg-surface-leaf p-5 shadow-touch">
-        <div className="mb-3 grid size-16 place-items-center rounded-2xl bg-card text-4xl shadow-touch" aria-hidden="true">
+      <header className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl bg-surface-leaf p-4 sm:p-5 shadow-touch">
+        <div className="mb-3 grid size-14 sm:size-16 place-items-center rounded-2xl bg-card text-3xl sm:text-4xl shadow-touch" aria-hidden="true">
           📧
         </div>
-        <h1 className="text-4xl font-black">Verify Your Email</h1>
-        <p className="mt-2 text-xl font-bold text-muted-foreground">
+        <h1 className="text-2xl sm:text-4xl font-black">Verify Your Email</h1>
+        <p className="mt-1.5 sm:mt-2 text-sm sm:text-xl font-bold text-muted-foreground break-all">
           We sent a 6-digit code to <span className="text-primary">{email}</span>
         </p>
       </header>
 
-      <form onSubmit={handleVerify} className="grid gap-4 rounded-3xl border bg-card p-4 shadow-touch md:p-6">
-        <label className="grid gap-2 text-lg font-black">
+      <form onSubmit={handleVerify} className="grid gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 md:p-6 shadow-touch">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Mail className="size-6 text-primary" />Enter OTP
           </span>
@@ -138,7 +146,7 @@ const VerifyOTP = () => {
             onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
             required
             placeholder="000000"
-            className="min-h-16 rounded-2xl text-center text-2xl font-bold tracking-widest"
+            className="min-h-14 sm:min-h-16 rounded-2xl text-center text-xl sm:text-2xl font-bold tracking-widest"
             maxLength={6}
             inputMode="numeric"
             autoComplete="one-time-code"
@@ -152,7 +160,7 @@ const VerifyOTP = () => {
           {isLoading ? "Verifying..." : "Verify & Continue"}
         </Button>
 
-        <div className="flex items-center justify-between rounded-2xl bg-muted p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-2xl bg-muted p-3 sm:p-4">
           <span className="text-sm font-bold text-muted-foreground">Didn't receive the code?</span>
           <Button
             type="button"
