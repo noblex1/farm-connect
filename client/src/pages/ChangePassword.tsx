@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useToast } from "@/hooks/use-toast";
-import { apiClient } from "@/services/apiClient";
+import { requestPasswordReset, verifyPasswordResetOTP, resetPassword } from "@/services/marketApi";
 
 type Step = "verify-identity" | "verify-otp" | "new-password";
 
@@ -19,6 +19,7 @@ const ChangePassword = () => {
   const [step, setStep] = useState<Step>("verify-identity");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const [resetToken, setResetToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -48,7 +49,7 @@ const ChangePassword = () => {
     setIsLoading(true);
 
     try {
-      await apiClient.post("/api/otp/forgot-password", { email });
+      await requestPasswordReset({ email });
       
       toast({
         title: "OTP Sent!",
@@ -73,7 +74,23 @@ const ChangePassword = () => {
       return;
     }
 
-    setStep("new-password");
+    setIsLoading(true);
+
+    try {
+      const response = await verifyPasswordResetOTP({ email, otp });
+      setResetToken(response.resetToken);
+      
+      toast({
+        title: "OTP Verified!",
+        description: "You can now set your new password.",
+      });
+
+      setStep("new-password");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChangePassword = async (e: FormEvent) => {
@@ -93,9 +110,9 @@ const ChangePassword = () => {
     setIsLoading(true);
 
     try {
-      await apiClient.post("/api/otp/reset-password", {
+      await resetPassword({
         email,
-        otp,
+        resetToken,
         newPassword,
       });
 
@@ -117,7 +134,7 @@ const ChangePassword = () => {
     setIsLoading(true);
 
     try {
-      await apiClient.post("/api/otp/forgot-password", { email });
+      await requestPasswordReset({ email });
       
       toast({
         title: "OTP Resent!",
@@ -234,10 +251,10 @@ const ChangePassword = () => {
                 type="submit"
                 variant="farm"
                 size="touch"
-                disabled={otp.length !== 6}
+                disabled={otp.length !== 6 || isLoading}
                 className="w-full"
               >
-                Verify Code
+                {isLoading ? "Verifying..." : "Verify Code"}
               </Button>
 
               <div className="flex items-center justify-between p-3 rounded-xl bg-muted">
