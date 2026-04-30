@@ -414,37 +414,43 @@ const NewLanding = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 bg-primary text-primary-foreground">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-6">
-            Ready to Get Started?
-          </h2>
-          <p className="text-lg sm:text-xl mb-8 opacity-90">
-            Join thousands of farmers and buyers already using Farm Market. 
-            Create your free account today.
-          </p>
+      <section className="py-16 sm:py-24 bg-background">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl bg-primary text-primary-foreground p-8 sm:p-12 lg:p-16 text-center shadow-2xl">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-6">
+              Ready to Get Started?
+            </h2>
+            <p className="text-lg sm:text-xl mb-8 opacity-90">
+              Join thousands of farmers and buyers already using Farm Market. 
+              Create your free account today.
+            </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="secondary" className="h-14 text-lg font-bold">
-              <Link to="/create-account?role=farmer">
-                <Leaf className="size-6" />
-                I'm a Farmer
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <Button asChild size="lg" variant="secondary" className="h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-shadow">
+                <Link to="/create-account?role=farmer">
+                  <Leaf className="size-6" />
+                  I'm a Farmer
+                </Link>
+              </Button>
+              <Button 
+                asChild 
+                size="lg" 
+                className="h-14 text-lg font-bold bg-white text-primary border-2 border-white hover:bg-white/90 hover:text-primary shadow-lg hover:shadow-xl transition-all"
+              >
+                <Link to="/create-account?role=buyer">
+                  <ShoppingCart className="size-6" />
+                  I'm a Buyer
+                </Link>
+              </Button>
+            </div>
+
+            <p className="text-sm opacity-90">
+              Already have an account?{" "}
+              <Link to="/login" className="underline font-bold hover:opacity-100 transition-opacity">
+                Sign in here
               </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-14 text-lg font-bold border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-              <Link to="/create-account?role=buyer">
-                <ShoppingCart className="size-6" />
-                I'm a Buyer
-              </Link>
-            </Button>
+            </p>
           </div>
-
-          <p className="mt-8 text-sm opacity-75">
-            Already have an account?{" "}
-            <Link to="/login" className="underline font-bold hover:opacity-100">
-              Sign in here
-            </Link>
-          </p>
         </div>
       </section>
 
