@@ -1,6 +1,12 @@
 import dotenv from "dotenv";
+import dns from "dns";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+
+// Prefer IPv4 for SMTP (some cloud ↔ Gmail paths fail on IPv6 only)
+if (process.env.SMTP_PREFER_IPV4 !== "false") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 // Get the directory of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +25,7 @@ console.log("SMTP_HOST:", process.env.SMTP_HOST);
 console.log("SMTP_PORT:", process.env.SMTP_PORT);
 console.log("SMTP_USER:", process.env.SMTP_USER);
 console.log("SMTP_PASS:", process.env.SMTP_PASS ? "SET" : "MISSING");
+console.log("SENDGRID_API_KEY:", process.env.SENDGRID_API_KEY ? "SET" : "MISSING");
 console.log("");
 
 import app from "./src/app.js";

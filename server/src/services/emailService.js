@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
 /** Attach HTTP status for express errorHandler (avoids misreporting mail failures as 500). */
 const httpError = (message, statusCode = 503) => {
@@ -20,6 +21,73 @@ const isSmtpConnectionFailure = (error) => {
   if (connectionCodes.has(error.code)) return true;
   if (error.message && /certificate|SSL|TLS|EPROTO|self signed/i.test(error.message)) return true;
   return false;
+};
+
+/**
+ * SendGrid uses HTTPS (port 443) — reliable on Render where raw SMTP to Gmail often fails.
+ * Set SENDGRID_API_KEY in Render; verify the same From address in SendGrid (Sender Authentication).
+ */
+const sendTransactionalEmail = async ({ to, subject, html, text, nodemailerHeaders }) => {
+  const fromEmail =
+    process.env.SMTP_FROM?.trim() ||
+    process.env.SENDGRID_FROM_EMAIL?.trim() ||
+    process.env.SMTP_USER?.trim();
+  if (!fromEmail) {
+    throw httpError("Set SMTP_FROM or SENDGRID_FROM_EMAIL as the verified sender address.", 503);
+  }
+
+  const sendGridKey = process.env.SENDGRID_API_KEY?.trim();
+  if (sendGridKey) {
+    console.log("📧 Mail transport: SendGrid API (HTTPS — avoids cloud SMTP issues)");
+    sgMail.setApiKey(sendGridKey);
+    try {
+      await sgMail.send({
+        to,
+        from: { email: fromEmail, name: "Farm Market" },
+        subject,
+        html,
+        text,
+      });
+      console.log("✅ Email sent via SendGrid (HTTPS API)");
+      return { messageId: "sendgrid", response: "202" };
+    } catch (err) {
+      const status = err.response?.statusCode;
+      const body = err.response?.body;
+      console.error("SendGrid API error:", status, JSON.stringify(body || err.message));
+      if (status === 401 || status === 403) {
+        throw httpError(
+          "SendGrid rejected the request. Check SENDGRID_API_KEY and verify your From address in SendGrid.",
+          502
+        );
+      }
+      throw httpError("Failed to send email via SendGrid. Please try again later.", 503);
+    }
+  }
+
+  console.log("📧 Mail transport: SMTP via nodemailer");
+  let transporter;
+  try {
+    transporter = createEmailTransporter();
+  } catch (transporterError) {
+    console.error("❌ Failed to create email transporter:", transporterError.message);
+    if (transporterError.statusCode) {
+      throw transporterError;
+    }
+    throw httpError("Email service is not configured. Please contact support.", 503);
+  }
+
+  const mailOptions = {
+    from: `"Farm Market" <${fromEmail}>`,
+    to,
+    subject,
+    html,
+    text,
+  };
+  if (nodemailerHeaders && Object.keys(nodemailerHeaders).length) {
+    mailOptions.headers = nodemailerHeaders;
+  }
+
+  return transporter.sendMail(mailOptions);
 };
 
 // Create transporter with improved configuration
@@ -91,12 +159,11 @@ const createEmailTransporter = () => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      // Add timeout and connection settings
-      connectionTimeout: 10000, // 10 seconds
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
-      // Add pool settings for better performance
-      pool: true,
+      connectionTimeout: parseInt(process.env.SMTP_CONNECTION_TIMEOUT_MS || "20000", 10),
+      greetingTimeout: parseInt(process.env.SMTP_GREETING_TIMEOUT_MS || "20000", 10),
+      socketTimeout: parseInt(process.env.SMTP_SOCKET_TIMEOUT_MS || "20000", 10),
+      // Pooling can cause stuck connections on some PaaS hosts; opt-in with SMTP_POOL=true
+      pool: process.env.SMTP_POOL === "true",
       maxConnections: 5,
       maxMessages: 100,
       // Add TLS options
@@ -128,31 +195,14 @@ export const sendRegistrationOTP = async (email, otp, userName) => {
     console.log(`📧 OTP: ${otp}`);
     console.log(`📧 User: ${userName}`);
     
-    // Create transporter (this might throw if SMTP not configured)
-    let transporter;
-    try {
-      transporter = createEmailTransporter();
-    } catch (transporterError) {
-      console.error("❌ Failed to create email transporter:");
-      console.error("Error:", transporterError.message);
-      if (transporterError.statusCode) {
-        throw transporterError;
-      }
-      throw httpError("Email service is not configured. Please contact support.", 503);
-    }
-
-    const mailOptions = {
-      from: `"Farm Market" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@farmmarket.com"}>`,
-      to: email,
-      subject: "Verify Your Farm Market Account - OTP Inside",
-      // Add headers to improve deliverability
-      headers: {
-        'X-Priority': '1',
-        'X-MSMail-Priority': 'High',
-        'Importance': 'high',
-        'X-Mailer': 'Farm Market Platform'
-      },
-      html: `
+    const subject = "Verify Your Farm Market Account - OTP Inside";
+    const nodemailerHeaders = {
+      "X-Priority": "1",
+      "X-MSMail-Priority": "High",
+      Importance: "high",
+      "X-Mailer": "Farm Market Platform",
+    };
+    const html = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -198,8 +248,8 @@ export const sendRegistrationOTP = async (email, otp, userName) => {
           </div>
         </body>
         </html>
-      `,
-      text: `
+      `;
+    const text = `
 Farm Market - Email Verification
 
 Welcome, ${userName}!
@@ -218,16 +268,20 @@ The Farm Market Team
 ---
 This is an automated email. Please do not reply.
 © ${new Date().getFullYear()} Farm Market. All rights reserved.
-      `,
-    };
+      `;
 
-    console.log("📧 Sending email with options:");
-    console.log("  From:", mailOptions.from);
-    console.log("  To:", mailOptions.to);
-    console.log("  Subject:", mailOptions.subject);
+    console.log("📧 Sending registration OTP:");
+    console.log("  To:", email);
+    console.log("  Subject:", subject);
 
-    const info = await transporter.sendMail(mailOptions);
-    
+    const info = await sendTransactionalEmail({
+      to: email,
+      subject,
+      html,
+      text,
+      nodemailerHeaders,
+    });
+
     console.log("✅ Registration OTP email sent successfully!");
     console.log("📧 Message ID:", info.messageId);
     console.log("📧 Response:", info.response);
@@ -282,30 +336,14 @@ export const sendPasswordResetOTP = async (email, otp, userName) => {
     console.log(`📧 OTP: ${otp}`);
     console.log(`📧 User: ${userName}`);
     
-    // Create transporter (this might throw if SMTP not configured)
-    let transporter;
-    try {
-      transporter = createEmailTransporter();
-    } catch (transporterError) {
-      console.error("❌ Failed to create email transporter:");
-      console.error("Error:", transporterError.message);
-      if (transporterError.statusCode) {
-        throw transporterError;
-      }
-      throw httpError("Email service is not configured. Please contact support.", 503);
-    }
-
-    const mailOptions = {
-      from: `"Farm Market" <${process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@farmmarket.com"}>`,
-      to: email,
-      subject: "Reset Your Farm Market Password - OTP Inside",
-      headers: {
-        'X-Priority': '1',
-        'X-MSMail-Priority': 'High',
-        'Importance': 'high',
-        'X-Mailer': 'Farm Market Platform'
-      },
-      html: `
+    const subject = "Reset Your Farm Market Password - OTP Inside";
+    const nodemailerHeaders = {
+      "X-Priority": "1",
+      "X-MSMail-Priority": "High",
+      Importance: "high",
+      "X-Mailer": "Farm Market Platform",
+    };
+    const html = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -355,8 +393,8 @@ export const sendPasswordResetOTP = async (email, otp, userName) => {
           </div>
         </body>
         </html>
-      `,
-      text: `
+      `;
+    const text = `
 Farm Market - Password Reset Request
 
 Hello ${userName},
@@ -373,16 +411,20 @@ The Farm Market Team
 ---
 This is an automated email. Please do not reply.
 © ${new Date().getFullYear()} Farm Market. All rights reserved.
-      `,
-    };
+      `;
 
-    console.log("📧 Sending email with options:");
-    console.log("  From:", mailOptions.from);
-    console.log("  To:", mailOptions.to);
-    console.log("  Subject:", mailOptions.subject);
+    console.log("📧 Sending password reset OTP:");
+    console.log("  To:", email);
+    console.log("  Subject:", subject);
 
-    const info = await transporter.sendMail(mailOptions);
-    
+    const info = await sendTransactionalEmail({
+      to: email,
+      subject,
+      html,
+      text,
+      nodemailerHeaders,
+    });
+
     console.log("✅ Password reset OTP email sent successfully!");
     console.log("📧 Message ID:", info.messageId);
     console.log("📧 Response:", info.response);
