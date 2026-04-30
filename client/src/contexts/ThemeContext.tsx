@@ -11,7 +11,7 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize theme from localStorage or system preference
+  // Initialize theme from localStorage or default to light
   const [theme, setThemeState] = useState<Theme>(() => {
     // Check localStorage first
     const savedTheme = localStorage.getItem("farm-market-theme") as Theme | null;
@@ -19,11 +19,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       return savedTheme;
     }
 
-    // Fall back to system preference
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-
+    // Default to light mode
     return "light";
   });
 
