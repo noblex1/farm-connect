@@ -96,42 +96,42 @@ const FarmerCreateAccount = () => {
   return (
     <section className="animate-gentle-rise">
       <RoleBasedRedirect />
-      <header className="mb-5 rounded-3xl bg-surface-leaf p-5 shadow-touch">
-        <div className="mb-3 grid size-16 place-items-center rounded-2xl bg-card text-4xl shadow-touch" aria-hidden="true">
+      <header className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl bg-surface-leaf p-4 sm:p-5 shadow-touch">
+        <div className="mb-3 grid size-14 sm:size-16 place-items-center rounded-2xl bg-card text-3xl sm:text-4xl shadow-touch" aria-hidden="true">
           🌱
         </div>
-        <h1 className="text-4xl font-black">Create {roleLabel} Account</h1>
-        <p className="mt-2 text-xl font-bold text-muted-foreground">{roleLabel} onboarding</p>
+        <h1 className="text-2xl sm:text-4xl font-black">Create {roleLabel} Account</h1>
+        <p className="mt-1.5 sm:mt-2 text-base sm:text-xl font-bold text-muted-foreground">{roleLabel} onboarding</p>
       </header>
 
-      {submitError && <div className="mb-5 rounded-3xl border border-destructive bg-card p-4 font-bold text-destructive">{submitError}</div>}
+      {submitError && <div className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl border border-destructive bg-card p-3 sm:p-4 font-bold text-destructive">{submitError}</div>}
 
-      <form onSubmit={onSubmit} className="grid gap-4 rounded-3xl border bg-card p-4 shadow-touch md:p-6">
-        <label className="grid gap-2 text-lg font-black">
+      <form onSubmit={onSubmit} className="grid gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 md:p-6 shadow-touch">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <UserRound className="size-6 text-primary" />Full Name
           </span>
-          <Input name="name" required placeholder="Amina Yakubu" className="min-h-16 rounded-2xl text-xl font-bold" />
+          <Input name="name" required placeholder="Amina Yakubu" className="min-h-14 sm:min-h-16 rounded-2xl text-base sm:text-xl font-bold" />
           {errors.name && <span className="text-base font-bold text-destructive">{errors.name}</span>}
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Mail className="size-6 text-primary" />Email Address
           </span>
-          <Input name="email" type="email" required placeholder="amina@example.com" className="min-h-16 rounded-2xl text-xl font-bold" />
+          <Input name="email" type="email" required placeholder="amina@example.com" className="min-h-14 sm:min-h-16 rounded-2xl text-base sm:text-xl font-bold" />
           {errors.email && <span className="text-base font-bold text-destructive">{errors.email}</span>}
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Phone className="size-6 text-primary" />Phone Number
           </span>
-          <Input name="phone" required inputMode="tel" placeholder="+233201234567" className="min-h-16 rounded-2xl text-xl font-bold" />
+          <Input name="phone" required inputMode="tel" placeholder="+233201234567" className="min-h-14 sm:min-h-16 rounded-2xl text-base sm:text-xl font-bold" />
           {errors.phone && <span className="text-base font-bold text-destructive">{errors.phone}</span>}
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Lock className="size-6 text-primary" />Password
           </span>
@@ -141,7 +141,7 @@ const FarmerCreateAccount = () => {
               type={showPassword ? "text" : "password"}
               required
               placeholder="At least 6 characters"
-              className="min-h-16 rounded-2xl pr-14 text-xl font-bold"
+              className="min-h-14 sm:min-h-16 rounded-2xl pr-14 text-base sm:text-xl font-bold"
             />
             <button
               type="button"
@@ -155,11 +155,11 @@ const FarmerCreateAccount = () => {
           {errors.password && <span className="text-base font-bold text-destructive">{errors.password}</span>}
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <MapPin className="size-6 text-secondary" />Location
           </span>
-          <Input name="location" required placeholder="Tamale" className="min-h-16 rounded-2xl text-xl font-bold" />
+          <Input name="location" required placeholder="Tamale" className="min-h-14 sm:min-h-16 rounded-2xl text-base sm:text-xl font-bold" />
           {errors.location && <span className="text-base font-bold text-destructive">{errors.location}</span>}
         </label>
 

@@ -51,18 +51,18 @@ const ForgotPassword = () => {
 
   return (
     <section className="animate-gentle-rise">
-      <header className="mb-5 rounded-3xl bg-surface-leaf p-5 shadow-touch">
-        <div className="mb-3 grid size-16 place-items-center rounded-2xl bg-card text-4xl shadow-touch" aria-hidden="true">
+      <header className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl bg-surface-leaf p-4 sm:p-5 shadow-touch">
+        <div className="mb-3 grid size-14 sm:size-16 place-items-center rounded-2xl bg-card text-3xl sm:text-4xl shadow-touch" aria-hidden="true">
           🔐
         </div>
-        <h1 className="text-4xl font-black">Forgot Password</h1>
-        <p className="mt-2 text-xl font-bold text-muted-foreground">
+        <h1 className="text-2xl sm:text-4xl font-black">Forgot Password</h1>
+        <p className="mt-1.5 sm:mt-2 text-base sm:text-xl font-bold text-muted-foreground">
           Enter your email to receive a reset code
         </p>
       </header>
 
-      <form onSubmit={onSubmit} className="grid gap-4 rounded-3xl border bg-card p-4 shadow-touch md:p-6">
-        <label className="grid gap-2 text-lg font-black">
+      <form onSubmit={onSubmit} className="grid gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 md:p-6 shadow-touch">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Mail className="size-6 text-secondary" />Email Address
           </span>
@@ -71,7 +71,7 @@ const ForgotPassword = () => {
             type="email"
             required
             placeholder="your-email@example.com"
-            className="min-h-16 rounded-2xl text-xl font-bold"
+            className="min-h-14 sm:min-h-16 rounded-2xl text-base sm:text-xl font-bold"
           />
         </label>
 
