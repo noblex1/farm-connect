@@ -1,5 +1,27 @@
 import nodemailer from "nodemailer";
 
+/** Attach HTTP status for express errorHandler (avoids misreporting mail failures as 500). */
+const httpError = (message, statusCode = 503) => {
+  const err = new Error(message);
+  err.statusCode = statusCode;
+  return err;
+};
+
+const isSmtpConnectionFailure = (error) => {
+  const connectionCodes = new Set([
+    "ESOCKET",
+    "ETIMEDOUT",
+    "ECONNREFUSED",
+    "ECONNRESET",
+    "ENOTFOUND",
+    "EPIPE",
+    "ECONNCLOSED",
+  ]);
+  if (connectionCodes.has(error.code)) return true;
+  if (error.message && /certificate|SSL|TLS|EPROTO|self signed/i.test(error.message)) return true;
+  return false;
+};
+
 // Create transporter with improved configuration
 const createEmailTransporter = () => {
   // Log all SMTP-related environment variables for debugging
@@ -27,9 +49,10 @@ const createEmailTransporter = () => {
     
     // In production, throw error instead of returning mock
     if (process.env.NODE_ENV === "production") {
-      const error = new Error("SMTP configuration is missing. Please configure SMTP environment variables in Render dashboard.");
-      error.statusCode = 503; // Service Unavailable
-      throw error;
+      throw httpError(
+        "SMTP configuration is missing. Please configure SMTP environment variables on the server (e.g. Render dashboard).",
+        503
+      );
     }
     
     // Development fallback - logs to console
@@ -70,8 +93,8 @@ const createEmailTransporter = () => {
       maxMessages: 100,
       // Add TLS options
       tls: {
-        rejectUnauthorized: true,
-        minVersion: 'TLSv1.2'
+        rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false",
+        minVersion: "TLSv1.2",
       },
       // Enable debug in development
       debug: process.env.NODE_ENV !== "production",
@@ -104,7 +127,10 @@ export const sendRegistrationOTP = async (email, otp, userName) => {
     } catch (transporterError) {
       console.error("❌ Failed to create email transporter:");
       console.error("Error:", transporterError.message);
-      throw new Error("Email service is not configured. Please contact support.");
+      if (transporterError.statusCode) {
+        throw transporterError;
+      }
+      throw httpError("Email service is not configured. Please contact support.", 503);
     }
 
     const mailOptions = {
@@ -213,19 +239,29 @@ This is an automated email. Please do not reply.
     console.error("Error message:", error.message);
     console.error("Error code:", error.code);
     console.error("Error stack:", error.stack);
-    
-    // Provide more specific error messages
-    if (error.code === "EAUTH") {
-      throw new Error("Email authentication failed. Please check SMTP credentials.");
-    } else if (error.code === "ESOCKET" || error.code === "ETIMEDOUT") {
-      throw new Error("Cannot connect to email server. Please check your internet connection.");
-    } else if (error.code === "EENVELOPE") {
-      throw new Error("Invalid email address format.");
-    } else if (error.message.includes("not configured")) {
-      throw error; // Re-throw configuration errors as-is
-    } else {
-      throw new Error("Failed to send verification email. Please try again later.");
+
+    if (error.statusCode) {
+      throw error;
     }
+    if (error.code === "EAUTH") {
+      throw httpError(
+        "Email could not be sent: SMTP authentication failed. Update SMTP_USER / SMTP_PASS on the server.",
+        502
+      );
+    }
+    if (error.code === "EENVELOPE") {
+      throw httpError("Invalid email address format.", 400);
+    }
+    if (isSmtpConnectionFailure(error)) {
+      throw httpError(
+        "We could not reach the mail server from our backend. This is usually a server SMTP or firewall issue, not your device. Please try again later or contact support.",
+        503
+      );
+    }
+    if (error.message && error.message.includes("not configured")) {
+      throw httpError(error.message, 503);
+    }
+    throw httpError("Failed to send verification email. Please try again later.", 503);
   }
 };
 
@@ -245,7 +281,10 @@ export const sendPasswordResetOTP = async (email, otp, userName) => {
     } catch (transporterError) {
       console.error("❌ Failed to create email transporter:");
       console.error("Error:", transporterError.message);
-      throw new Error("Email service is not configured. Please contact support.");
+      if (transporterError.statusCode) {
+        throw transporterError;
+      }
+      throw httpError("Email service is not configured. Please contact support.", 503);
     }
 
     const mailOptions = {
@@ -355,19 +394,29 @@ This is an automated email. Please do not reply.
     console.error("Error message:", error.message);
     console.error("Error code:", error.code);
     console.error("Error stack:", error.stack);
-    
-    // Provide more specific error messages
-    if (error.code === "EAUTH") {
-      throw new Error("Email authentication failed. Please check SMTP credentials.");
-    } else if (error.code === "ESOCKET" || error.code === "ETIMEDOUT") {
-      throw new Error("Cannot connect to email server. Please check your internet connection.");
-    } else if (error.code === "EENVELOPE") {
-      throw new Error("Invalid email address format.");
-    } else if (error.message.includes("not configured")) {
-      throw error; // Re-throw configuration errors as-is
-    } else {
-      throw new Error("Failed to send password reset email. Please try again later.");
+
+    if (error.statusCode) {
+      throw error;
     }
+    if (error.code === "EAUTH") {
+      throw httpError(
+        "Email could not be sent: SMTP authentication failed. Update SMTP_USER / SMTP_PASS on the server.",
+        502
+      );
+    }
+    if (error.code === "EENVELOPE") {
+      throw httpError("Invalid email address format.", 400);
+    }
+    if (isSmtpConnectionFailure(error)) {
+      throw httpError(
+        "We could not reach the mail server from our backend. This is usually a server SMTP or firewall issue, not your device. Please try again later or contact support.",
+        503
+      );
+    }
+    if (error.message && error.message.includes("not configured")) {
+      throw httpError(error.message, 503);
+    }
+    throw httpError("Failed to send password reset email. Please try again later.", 503);
   }
 };
 

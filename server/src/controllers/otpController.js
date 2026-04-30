@@ -66,9 +66,13 @@ export const registerWithOTP = asyncHandler(async (req, res) => {
 
   console.log("✅ OTP stored in database");
 
-  // Send OTP email - DO NOT catch errors, let them propagate
   console.log("📧 Attempting to send registration OTP email...");
-  await sendRegistrationOTP(normalizedEmail, otp, name.trim());
+  try {
+    await sendRegistrationOTP(normalizedEmail, otp, name.trim());
+  } catch (err) {
+    await OTP.deleteMany({ email: normalizedEmail, type: "registration" });
+    throw err;
+  }
   console.log("✅ Registration OTP email sent successfully!");
 
   // Return success
@@ -158,9 +162,13 @@ export const resendRegistrationOTP = asyncHandler(async (req, res) => {
     expiresAt,
   });
 
-  // Send OTP email
   console.log("📧 Attempting to resend registration OTP email...");
-  await sendRegistrationOTP(normalizedEmail, otp, name || "User");
+  try {
+    await sendRegistrationOTP(normalizedEmail, otp, name || "User");
+  } catch (err) {
+    await OTP.deleteMany({ email: normalizedEmail, type: "registration" });
+    throw err;
+  }
   console.log("✅ Registration OTP email resent successfully!");
 
   res.status(200).json({
@@ -204,9 +212,13 @@ export const requestPasswordReset = asyncHandler(async (req, res) => {
     expiresAt,
   });
 
-  // Send OTP email
   console.log("📧 Attempting to send password reset OTP email...");
-  await sendPasswordResetOTP(normalizedEmail, otp, user.name);
+  try {
+    await sendPasswordResetOTP(normalizedEmail, otp, user.name);
+  } catch (err) {
+    await OTP.deleteMany({ email: normalizedEmail, type: "password-reset" });
+    throw err;
+  }
   console.log("✅ Password reset OTP email sent successfully!");
 
   res.status(200).json({
