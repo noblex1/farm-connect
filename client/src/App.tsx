@@ -30,6 +30,7 @@ import AdminAnalytics from "./pages/AdminAnalytics.tsx";
 import Settings from "./pages/Settings.tsx";
 import Favorites from "./pages/Favorites.tsx";
 import ChangePassword from "./pages/ChangePassword.tsx";
+import NewLanding from "./pages/NewLanding.tsx";
 
 const queryClient = new QueryClient();
 
@@ -42,7 +43,7 @@ const App = () => (
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<FarmShell />}>
-              <Route index element={<Index />} />
+              <Route index element={<NewLanding />} />
               <Route path="home" element={<Landing />} />
               <Route path="login" element={<FarmerLogin />} />
               <Route path="create-account" element={<FarmerCreateAccount />} />
