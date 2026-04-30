@@ -63,13 +63,21 @@ const NewLanding = () => {
 
             {/* Right Visual */}
             <div className="relative">
-              <div className="relative aspect-square rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/20 p-8 shadow-2xl">
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/10 to-transparent" />
+              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
+                {/* Background Image */}
+                <img 
+                  src="/market.jpeg" 
+                  alt="Farm Market" 
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-transparent to-secondary/40" />
                 
                 {/* Floating Cards */}
-                <div className="relative h-full flex items-center justify-center">
+                <div className="relative h-full flex items-center justify-center p-8">
                   <div className="absolute top-8 left-8 animate-leaf-sway">
-                    <Card className="w-32 sm:w-40 shadow-lg">
+                    <Card className="w-32 sm:w-40 shadow-xl backdrop-blur-sm bg-card/95">
                       <CardContent className="p-4 text-center">
                         <div className="text-4xl mb-2">🌽</div>
                         <div className="text-xs font-bold">Fresh Maize</div>
@@ -79,7 +87,7 @@ const NewLanding = () => {
                   </div>
 
                   <div className="absolute top-1/4 right-8 animate-leaf-sway" style={{ animationDelay: "0.5s" }}>
-                    <Card className="w-32 sm:w-40 shadow-lg">
+                    <Card className="w-32 sm:w-40 shadow-xl backdrop-blur-sm bg-card/95">
                       <CardContent className="p-4 text-center">
                         <div className="text-4xl mb-2">🍚</div>
                         <div className="text-xs font-bold">Premium Rice</div>
@@ -89,7 +97,7 @@ const NewLanding = () => {
                   </div>
 
                   <div className="absolute bottom-8 left-1/4 animate-leaf-sway" style={{ animationDelay: "1s" }}>
-                    <Card className="w-32 sm:w-40 shadow-lg">
+                    <Card className="w-32 sm:w-40 shadow-xl backdrop-blur-sm bg-card/95">
                       <CardContent className="p-4 text-center">
                         <div className="text-4xl mb-2">🥔</div>
                         <div className="text-xs font-bold">Fresh Yam</div>
@@ -98,8 +106,11 @@ const NewLanding = () => {
                     </Card>
                   </div>
 
-                  {/* Center Icon */}
-                  <div className="text-8xl sm:text-9xl">👨🏾‍🌾</div>
+                  {/* Center Badge */}
+                  <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-2xl px-6 py-4 shadow-2xl">
+                    <div className="text-5xl mb-2 text-center">👨🏾‍🌾</div>
+                    <div className="text-sm font-bold text-center">Farm Fresh</div>
+                  </div>
                 </div>
               </div>
             </div>
