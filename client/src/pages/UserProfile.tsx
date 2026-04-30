@@ -1,9 +1,8 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Mail, MessageCircle, Phone, Upload, UserRound } from "lucide-react";
+import { Mail, Upload, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LogoutButton } from "@/components/LogoutButton";
 import { sessionStore } from "@/lib/session";
 import { updateCurrentUser } from "@/services/marketApi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -145,7 +144,7 @@ const UserProfile = () => {
 
   if (!token) {
     return (
-      <section className="animate-gentle-rise rounded-3xl border bg-card p-6 text-center">
+      <section className="animate-gentle-rise rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-6 text-center">
         <p className="text-xl font-black">Please login to view your profile.</p>
       </section>
     );
@@ -153,7 +152,7 @@ const UserProfile = () => {
 
   if (isLoading) {
     return (
-      <section className="animate-gentle-rise rounded-3xl border bg-card p-6 text-center">
+      <section className="animate-gentle-rise rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-6 text-center">
         <p className="text-xl font-black">Loading profile...</p>
       </section>
     );
@@ -161,15 +160,12 @@ const UserProfile = () => {
 
   if (isError || !profile) {
     return (
-      <section className="animate-gentle-rise rounded-3xl border border-destructive bg-card p-6 text-center">
+      <section className="animate-gentle-rise rounded-2xl sm:rounded-3xl border border-destructive bg-card p-4 sm:p-6 text-center">
         <p className="text-xl font-black text-destructive">{error instanceof Error ? error.message : "Could not load profile"}</p>
       </section>
     );
   }
 
-  const whatsappLink = `https://wa.me/${(profile.whatsappNumber || profile.phoneNumber).replace(/\D/g, "")}?text=${encodeURIComponent(
-    "Hello, I want to ask about your farm produce"
-  )}`;
   const avatarSrc = photoPreview || profile.profilePicture;
 
   console.log("=== Avatar Display ===");
@@ -179,16 +175,16 @@ const UserProfile = () => {
 
   return (
     <section className="animate-gentle-rise">
-      <header className="mb-5 rounded-3xl bg-surface-leaf p-5 shadow-touch">
+      <header className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl bg-surface-leaf p-4 sm:p-5 shadow-touch">
         {/* Mobile: Show only profile picture */}
         <div className="flex flex-col items-center md:items-start">
-          <div className="grid size-24 place-items-center overflow-hidden rounded-3xl bg-card text-5xl shadow-touch" aria-hidden="true">
+          <div className="grid size-20 sm:size-24 place-items-center overflow-hidden rounded-2xl sm:rounded-3xl bg-card text-4xl sm:text-5xl shadow-touch" aria-hidden="true">
             {avatarSrc ? <img src={avatarSrc} alt="Profile" className="h-full w-full object-cover" /> : "👤"}
           </div>
           {/* Desktop: Show role and name */}
           <div className="hidden md:block mt-3">
-            <p className="text-lg font-bold text-muted-foreground">{profile.role} Profile</p>
-            <h1 className="mt-1 text-4xl font-black">{profile.name}</h1>
+            <p className="text-base sm:text-lg font-bold text-muted-foreground">{profile.role} Profile</p>
+            <h1 className="mt-1 text-2xl sm:text-4xl font-black">{profile.name}</h1>
           </div>
         </div>
       </header>
@@ -196,32 +192,32 @@ const UserProfile = () => {
       {saveError && <div className="mb-4 rounded-2xl border border-destructive bg-card p-3 font-bold text-destructive">{saveError}</div>}
       {saveSuccess && <div className="mb-4 rounded-2xl border bg-surface-leaf p-3 font-bold text-primary">{saveSuccess}</div>}
 
-      <form onSubmit={onSubmit} className="grid gap-4 rounded-3xl border bg-card p-4 shadow-touch md:p-6">
-        <label className="grid gap-2 text-lg font-black">
+      <form onSubmit={onSubmit} className="grid gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 md:p-6 shadow-touch">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
-            <UserRound className="size-8 text-primary" aria-hidden="true" />Name
+            <UserRound className="size-6 sm:size-8 text-primary" aria-hidden="true" />Name
           </span>
-          <Input name="name" defaultValue={initial.name} required className="min-h-14 rounded-2xl text-xl font-bold" />
+          <Input name="name" defaultValue={initial.name} required className="min-h-14 rounded-2xl text-base sm:text-xl font-bold" />
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           Location
-          <Input name="location" defaultValue={initial.location} required className="min-h-14 rounded-2xl text-xl font-bold" />
+          <Input name="location" defaultValue={initial.location} required className="min-h-14 rounded-2xl text-base sm:text-xl font-bold" />
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
-            <Mail className="size-8 text-secondary" aria-hidden="true" />Email
+            <Mail className="size-6 sm:size-8 text-secondary" aria-hidden="true" />Email
           </span>
-          <Input name="email" type="email" defaultValue={initial.email} className="min-h-14 rounded-2xl text-xl font-bold" />
+          <Input name="email" type="email" defaultValue={initial.email} className="min-h-14 rounded-2xl text-base sm:text-xl font-bold" />
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           WhatsApp Number
-          <Input name="whatsappNumber" defaultValue={initial.whatsappNumber} className="min-h-14 rounded-2xl text-xl font-bold" />
+          <Input name="whatsappNumber" defaultValue={initial.whatsappNumber} className="min-h-14 rounded-2xl text-base sm:text-xl font-bold" />
         </label>
 
-        <label className="grid gap-2 text-lg font-black">
+        <label className="grid gap-2 text-base sm:text-lg font-black">
           <span className="flex items-center gap-2">
             <Upload className="size-6 text-primary" />Profile Photo
           </span>
@@ -243,24 +239,9 @@ const UserProfile = () => {
           )}
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Button asChild variant="farm" size="touch">
-            <a href={`tel:${profile.phoneNumber.replace(/\s/g, "")}`}>
-              <Phone className="size-7" />Call
-            </a>
-          </Button>
-          <Button asChild variant="harvest" size="touch">
-            <a href={whatsappLink}>
-              <MessageCircle className="size-7" />WhatsApp
-            </a>
-          </Button>
-        </div>
-
         <Button type="submit" variant="farm" size="touch" disabled={isSaving}>
           {isSaving ? "Saving..." : "Save Profile"}
         </Button>
-
-        <LogoutButton variant="destructive" size="touch" />
       </form>
     </section>
   );
