@@ -73,6 +73,10 @@ const transporter = nodemailer.createTransport({
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 10000,
+  tls: {
+    rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== "false",
+    minVersion: "TLSv1.2",
+  },
 });
 
 try {
@@ -110,11 +114,11 @@ try {
     console.log("   - Generate one at: https://myaccount.google.com/apppasswords");
     console.log("   - Make sure 2FA is enabled on your Gmail account");
   } else if (error.code === "ESOCKET" || error.code === "ETIMEDOUT") {
-    console.log("   Connection timeout. Possible causes:");
-    console.log("   - Firewall blocking port 587");
-    console.log("   - Wrong SMTP host or port");
-    console.log("   - No internet connection");
-    console.log("   - SMTP server is down");
+    console.log("   Connection timeout or socket error. Possible causes:");
+    console.log("   - Wrong SMTP_HOST / SMTP_PORT (try 587 + SMTP_SECURE=false, or 465 + SMTP_SECURE=true)");
+    console.log("   - Host/provider blocking outbound SMTP from cloud IPs (Render, etc.)");
+    console.log("   - Corporate firewall / DNS issues on the server side");
+    console.log("   - If testing locally: check your network; if only failing on Render, fix SMTP or use a transactional API (Resend, SendGrid)");
   } else if (error.code === "ECONNREFUSED") {
     console.log("   Connection refused. Possible causes:");
     console.log("   - Wrong port number");
