@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle2, Mail, MapPin, Phone, Sprout, Lock, Eye, EyeOff, UserRound } from "lucide-react";
+import { Mail, MapPin, Phone, Sprout, Lock, Eye, EyeOff, UserRound } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,26 +10,31 @@ import { useToast } from "@/hooks/use-toast";
 import { RoleBasedRedirect } from "@/components/auth/RoleBasedRedirect";
 import type { UserRole } from "@/types/api";
 
-const farmerAccountSchema = z.object({
-  name: z.string().trim().min(2, "Enter farmer name").max(80, "Name is too long"),
+const accountSchema = z.object({
+  name: z.string().trim().min(2, "Enter your name").max(80, "Name is too long"),
   email: z.string().trim().email("Enter a valid email address"),
   phone: z.string().trim().regex(/^\+?[0-9]{9,15}$/, "Enter a valid phone number"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   location: z.string().trim().min(2, "Enter a location").max(80, "Location is too long"),
 });
 
-type FarmerAccount = z.infer<typeof farmerAccountSchema>;
+type AccountForm = z.infer<typeof accountSchema>;
+
+/** Role from landing CTA (Start Buying / Start Selling); not shown on the form. */
+const resolveSignupRole = (param: string | null): UserRole => {
+  if (param === "farmer" || param === "buyer") return param;
+  return "buyer";
+};
 
 const FarmerCreateAccount = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [errors, setErrors] = useState<Partial<Record<keyof FarmerAccount, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof AccountForm, string>>>({});
   const [submitError, setSubmitError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
-  const requestedRole = (searchParams.get("role") as UserRole | null) || "farmer";
-  const roleLabel = requestedRole === "buyer" ? "Buyer" : "Farmer";
+  const signupRole = resolveSignupRole(searchParams.get("role"));
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,7 +50,7 @@ const FarmerCreateAccount = () => {
       location: String(form.get("location") || ""),
     };
 
-    const parsed = farmerAccountSchema.safeParse(values);
+    const parsed = accountSchema.safeParse(values);
 
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors;
@@ -67,7 +72,7 @@ const FarmerCreateAccount = () => {
         phoneNumber: parsed.data.phone,
         password: parsed.data.password,
         location: parsed.data.location,
-        role: requestedRole === "buyer" ? "buyer" : "farmer",
+        role: signupRole,
       });
 
       setErrors({});
@@ -77,16 +82,15 @@ const FarmerCreateAccount = () => {
         description: "Check your email for the verification code.",
       });
 
-      // Navigate to OTP verification page with registration data
       const params = new URLSearchParams({
         email: parsed.data.email,
         name: parsed.data.name,
         phone: parsed.data.phone,
         password: parsed.data.password,
         location: parsed.data.location,
-        role: requestedRole === "buyer" ? "buyer" : "farmer",
+        role: signupRole,
       });
-      
+
       navigate(`/verify-otp?${params.toString()}`, { replace: true });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Could not create account. Please try again.");
@@ -98,14 +102,13 @@ const FarmerCreateAccount = () => {
     <div className="min-h-[calc(100vh-12rem)] flex items-center justify-center py-8 sm:py-12">
       <div className="w-full max-w-md animate-gentle-rise">
         <RoleBasedRedirect />
-        
-        {/* Header */}
+
         <div className="text-center mb-8">
           <div className="inline-flex size-16 sm:size-20 items-center justify-center rounded-2xl bg-surface-leaf text-4xl sm:text-5xl shadow-sm mb-4">
-            {requestedRole === "buyer" ? "🛒" : "🌱"}
+            🌱
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">Create Account</h1>
-          <p className="text-base sm:text-lg text-muted-foreground">Join as a {roleLabel.toLowerCase()}</p>
+          <p className="text-base sm:text-lg text-muted-foreground">Join Farm Market today</p>
         </div>
 
         {submitError && (
@@ -114,7 +117,6 @@ const FarmerCreateAccount = () => {
           </div>
         )}
 
-        {/* Form Card */}
         <Card className="rounded-2xl border-2 shadow-lg">
           <CardContent className="p-6 sm:p-8">
             <form onSubmit={onSubmit} className="space-y-5">
@@ -123,11 +125,11 @@ const FarmerCreateAccount = () => {
                   <UserRound className="size-4 text-primary" />
                   Full Name
                 </label>
-                <Input 
+                <Input
                   id="name"
-                  name="name" 
-                  required 
-                  placeholder="Amina Yakubu" 
+                  name="name"
+                  required
+                  placeholder="Amina Yakubu"
                   className="h-12 rounded-xl text-base"
                 />
                 {errors.name && <p className="text-sm font-medium text-destructive">{errors.name}</p>}
@@ -138,12 +140,12 @@ const FarmerCreateAccount = () => {
                   <Mail className="size-4 text-primary" />
                   Email Address
                 </label>
-                <Input 
+                <Input
                   id="email"
-                  name="email" 
-                  type="email" 
-                  required 
-                  placeholder="amina@example.com" 
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="amina@example.com"
                   className="h-12 rounded-xl text-base"
                 />
                 {errors.email && <p className="text-sm font-medium text-destructive">{errors.email}</p>}
@@ -154,12 +156,12 @@ const FarmerCreateAccount = () => {
                   <Phone className="size-4 text-primary" />
                   Phone Number
                 </label>
-                <Input 
+                <Input
                   id="phone"
-                  name="phone" 
-                  required 
-                  inputMode="tel" 
-                  placeholder="+233201234567" 
+                  name="phone"
+                  required
+                  inputMode="tel"
+                  placeholder="+233201234567"
                   className="h-12 rounded-xl text-base"
                 />
                 {errors.phone && <p className="text-sm font-medium text-destructive">{errors.phone}</p>}
@@ -196,11 +198,11 @@ const FarmerCreateAccount = () => {
                   <MapPin className="size-4 text-primary" />
                   Location
                 </label>
-                <Input 
+                <Input
                   id="location"
-                  name="location" 
-                  required 
-                  placeholder="Tamale" 
+                  name="location"
+                  required
+                  placeholder="Tamale"
                   className="h-12 rounded-xl text-base"
                 />
                 {errors.location && <p className="text-sm font-medium text-destructive">{errors.location}</p>}
@@ -223,14 +225,10 @@ const FarmerCreateAccount = () => {
           </CardContent>
         </Card>
 
-        {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link 
-              to={`/login?role=${requestedRole}`}
-              className="font-semibold text-primary hover:underline"
-            >
+            <Link to="/login" className="font-semibold text-primary hover:underline">
               Sign in instead
             </Link>
           </p>

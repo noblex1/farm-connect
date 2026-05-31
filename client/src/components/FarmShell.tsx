@@ -1,46 +1,70 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { LineChart, Package, ShoppingBasket, Sprout, UserRound, Settings, Heart } from "lucide-react";
+import { Home, LineChart, Package, PlusCircle, UserRound, Settings, Heart } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { InstallPWA } from "@/components/InstallPWA";
 import { sessionStore } from "@/lib/session";
+import { getRoleHomePath } from "@/lib/roleHome";
+import type { UserRole } from "@/types/api";
 
-const navItems = [
-  { to: "/buyer", label: "Buy", icon: ShoppingBasket, roles: ["buyer"] },
-  { to: "/farmer", label: "Farmer", icon: Sprout, roles: ["farmer"] },
-  { to: "/admin", label: "Admin", icon: LineChart, roles: ["admin"] },
-  { to: "/prices", label: "Prices", icon: LineChart, roles: ["farmer", "buyer"] },
-  { to: "/favorites", label: "Saved", icon: Heart, roles: ["buyer"] },
-  { to: "/listings", label: "Mine", icon: Package, roles: ["farmer"] },
-  { to: "/profile", label: "Profile", icon: UserRound, roles: ["farmer", "buyer", "admin"] },
-  { to: "/settings", label: "Settings", icon: Settings, roles: ["farmer", "buyer", "admin"] },
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof Home;
+  end?: boolean;
+};
+
+const buyerNav: NavItem[] = [
+  { to: "/buyer", label: "Home", icon: Home },
+  { to: "/favorites", label: "Saved", icon: Heart },
+  { to: "/prices", label: "Prices", icon: LineChart },
+  { to: "/profile", label: "Profile", icon: UserRound },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
+
+const farmerNav: NavItem[] = [
+  { to: "/listings", label: "Home", icon: Home },
+  { to: "/post", label: "Post", icon: PlusCircle },
+  { to: "/prices", label: "Prices", icon: LineChart },
+  { to: "/profile", label: "Profile", icon: UserRound },
+  { to: "/settings", label: "Settings", icon: Settings },
+];
+
+const adminNav: NavItem[] = [
+  { to: "/admin", label: "Home", icon: Home },
+  { to: "/admin/users", label: "Users", icon: UserRound },
+  { to: "/admin/listings", label: "Listings", icon: Package },
+  { to: "/prices", label: "Prices", icon: LineChart },
+  { to: "/settings", label: "Settings", icon: Settings },
+];
+
+const navByRole: Record<UserRole, NavItem[]> = {
+  buyer: buyerNav,
+  farmer: farmerNav,
+  admin: adminNav,
+};
 
 export const FarmShell = () => {
   const { data } = useCurrentUser();
-  const sessionUser = sessionStore.getUser<{ name?: string; role?: "farmer" | "buyer" | "admin"; profilePicture?: string }>();
+  const sessionUser = sessionStore.getUser<{
+    name?: string;
+    role?: UserRole;
+    profilePicture?: string;
+  }>();
   const user = data?.user ?? sessionUser;
   const firstName = user?.name.split(" ")[0];
-  const isLoggedIn = Boolean(user);
-  
-  // Filter nav items based on user role
-  const visibleNavItems = user?.role
-    ? navItems.filter(item => item.roles.includes(user.role))
-    : navItems;
-
-  // Get mobile nav items (limit to 5 most important)
-  const mobileNavItems = user?.role === "farmer"
-    ? visibleNavItems.filter(item => ["Farmer", "Mine", "Prices", "Profile", "Settings"].includes(item.label))
-    : user?.role === "buyer"
-    ? visibleNavItems.filter(item => ["Buy", "Saved", "Prices", "Profile", "Settings"].includes(item.label))
-    : user?.role === "admin"
-    ? visibleNavItems.filter(item => ["Admin", "Prices", "Profile", "Settings"].includes(item.label))
-    : visibleNavItems.slice(0, 5);
+  const isLoggedIn = Boolean(user?.role);
+  const appHome = user?.role ? getRoleHomePath(user.role) : "/";
+  const visibleNavItems = user?.role ? navByRole[user.role] : [];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <Link to="/" className="flex items-center gap-2 sm:gap-2.5 font-black text-foreground hover:text-primary transition-colors" aria-label="Farm Produce Marketplace home">
+          <Link
+            to={isLoggedIn ? appHome : "/"}
+            className="flex items-center gap-2 sm:gap-2.5 font-black text-foreground hover:text-primary transition-colors"
+            aria-label={isLoggedIn ? "Go to app home" : "Farm Market home"}
+          >
             <span className="grid size-10 sm:size-11 place-items-center rounded-xl sm:rounded-2xl bg-surface-leaf text-2xl sm:text-3xl shadow-sm">🌾</span>
             <span className="leading-tight text-base sm:text-lg lg:text-xl">Farm Market</span>
           </Link>
@@ -81,14 +105,17 @@ export const FarmShell = () => {
       </header>
 
       <div className="flex">
-        {/* Desktop Sidebar */}
         {isLoggedIn && (
-          <aside className="hidden md:block w-64 lg:w-72 border-r bg-card/50 sticky top-[73px] h-[calc(100vh-73px)] overflow-y-auto" aria-label="Main navigation">
+          <aside
+            className="hidden md:block w-64 lg:w-72 border-r bg-card/50 sticky top-[73px] h-[calc(100vh-73px)] overflow-y-auto"
+            aria-label="Main navigation"
+          >
             <nav className="p-4 space-y-2">
-              {visibleNavItems.map(({ to, label, icon: Icon }) => (
+              {visibleNavItems.map(({ to, label, icon: Icon, end }) => (
                 <NavLink
                   key={to}
                   to={to}
+                  end={end}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
                       isActive
@@ -105,23 +132,26 @@ export const FarmShell = () => {
           </aside>
         )}
 
-        {/* Main Content */}
-        <main className={`flex-1 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 lg:pt-10 ${isLoggedIn ? "pb-20 md:pb-12" : "pb-8 sm:pb-12"}`}>
+        <main
+          className={`flex-1 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 lg:pt-10 ${isLoggedIn ? "pb-20 md:pb-12" : "pb-8 sm:pb-12"}`}
+        >
           <Outlet />
         </main>
       </div>
 
-      {/* PWA Install Prompt */}
       <InstallPWA />
 
-      {/* Mobile Bottom Navigation */}
       {isLoggedIn && (
-        <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-surface-leaf safe-bottom shadow-soft md:hidden" aria-label="Main navigation">
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 border-t bg-surface-leaf safe-bottom shadow-soft md:hidden"
+          aria-label="Main navigation"
+        >
           <div className="grid grid-cols-5 px-1 pt-1.5 pb-1">
-            {mobileNavItems.slice(0, 5).map(({ to, label, icon: Icon }) => (
+            {visibleNavItems.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
+                end={end}
                 className={({ isActive }) =>
                   `flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[10px] font-bold transition ${
                     isActive

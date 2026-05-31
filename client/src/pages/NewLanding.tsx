@@ -31,13 +31,13 @@ const NewLanding = () => {
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Button asChild size="lg" variant="farm" className="h-14 sm:h-16 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
-                  <Link to="/login?role=buyer">
+                  <Link to="/login">
                     <ShoppingCart className="size-6" />
                     Start Buying
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-14 sm:h-16 text-base sm:text-lg font-semibold border-2 hover:bg-surface-leaf hover:border-primary transition-all">
-                  <Link to="/login?role=farmer">
+                  <Link to="/login">
                     <Leaf className="size-6" />
                     Start Selling
                   </Link>
@@ -475,7 +475,7 @@ const NewLanding = () => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/create-account?role=farmer" className="hover:text-primary">Create Account</Link></li>
                 <li><Link to="/prices" className="hover:text-primary">Market Prices</Link></li>
-                <li><Link to="/login?role=farmer" className="hover:text-primary">Farmer Login</Link></li>
+                <li><Link to="/login" className="hover:text-primary">Sign In</Link></li>
               </ul>
             </div>
 
@@ -484,7 +484,7 @@ const NewLanding = () => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/create-account?role=buyer" className="hover:text-primary">Create Account</Link></li>
                 <li><Link to="/buyer" className="hover:text-primary">Browse Produce</Link></li>
-                <li><Link to="/login?role=buyer" className="hover:text-primary">Buyer Login</Link></li>
+                <li><Link to="/login" className="hover:text-primary">Sign In</Link></li>
               </ul>
             </div>
 

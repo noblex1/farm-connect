@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { verifyRegistrationOTP, resendRegistrationOTP } from "@/services/marketApi";
 import { sessionStore } from "@/lib/session";
+import { getRoleHomePath } from "@/lib/roleHome";
 import { useToast } from "@/hooks/use-toast";
 
 const VerifyOTP = () => {
@@ -87,17 +88,7 @@ const VerifyOTP = () => {
         description: `Welcome to Farm Market, ${response.user.name.split(" ")[0]}!`,
       });
 
-      // Role-based redirect
-      const roleRoutes: Record<string, string> = {
-        farmer: "/farmer",
-        buyer: "/buyer",
-        admin: "/prices",
-      };
-
-      const targetRoute = roleRoutes[response.user.role] || "/farmer";
-      
-      // Force a page reload to ensure all components re-render with new auth state
-      window.location.href = targetRoute;
+      window.location.href = getRoleHomePath(response.user.role);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Verification failed. Please try again.");
       setIsLoading(false);

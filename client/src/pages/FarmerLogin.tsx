@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { LogIn, Mail, Lock, Sprout, Eye, EyeOff } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { loginUser } from "@/services/marketApi";
 import { sessionStore } from "@/lib/session";
 import { useToast } from "@/hooks/use-toast";
 import { RoleBasedRedirect } from "@/components/auth/RoleBasedRedirect";
-import type { UserRole } from "@/types/api";
+import { getRoleHomePath } from "@/lib/roleHome";
 
 const loginSchema = z.object({
   emailOrPhone: z.string().trim().min(1, "Email or phone number is required"),
@@ -18,16 +18,13 @@ const loginSchema = z.object({
 });
 
 const FarmerLogin = () => {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
-  const requestedRole = (searchParams.get("role") as UserRole | null) || "farmer";
   const nextPath = searchParams.get("next");
-  const roleLabel = requestedRole === "buyer" ? "Buyer" : "Farmer";
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,7 +32,7 @@ const FarmerLogin = () => {
     setIsLoading(true);
 
     const form = new FormData(event.currentTarget);
-    const parsed = loginSchema.safeParse({ 
+    const parsed = loginSchema.safeParse({
       emailOrPhone: String(form.get("emailOrPhone") || ""),
       password: String(form.get("password") || ""),
     });
@@ -48,19 +45,11 @@ const FarmerLogin = () => {
     }
 
     try {
-      const response = await loginUser({ 
+      const response = await loginUser({
         emailOrPhone: parsed.data.emailOrPhone,
         password: parsed.data.password,
       });
 
-      // Allow admin to login regardless of requested role
-      if (requestedRole && response.user.role !== requestedRole && response.user.role !== 'admin') {
-        setError(`This account is registered as ${response.user.role}. Please use a ${roleLabel.toLowerCase()} account.`);
-        setIsLoading(false);
-        return;
-      }
-
-      // Store authentication data
       sessionStore.setToken(response.token);
       sessionStore.setUser(response.user);
 
@@ -74,31 +63,16 @@ const FarmerLogin = () => {
         })
       );
 
-      // Invalidate and refetch user query to update UI immediately
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       queryClient.setQueryData(["currentUser", response.token], { user: response.user });
 
-      // Role-based redirect
-      const roleRoutes: Record<string, string> = {
-        farmer: "/farmer",
-        buyer: "/buyer",
-        admin: "/admin",
-      };
+      const targetRoute = nextPath || getRoleHomePath(response.user.role);
 
-      // If there's a next path and user has permission, go there
-      // Otherwise, redirect to role-specific dashboard
-      const targetRoute = nextPath || roleRoutes[response.user.role] || "/farmer";
-      
-      // Show success toast
       toast({
         title: "Login successful!",
         description: `Welcome back, ${response.user.name.split(" ")[0]}!`,
       });
 
-      // Use replace to prevent back button issues
-      navigate(targetRoute, { replace: true });
-      
-      // Force a page reload to ensure all components re-render with new auth state
       window.location.href = targetRoute;
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Login failed. Please try again.");
@@ -110,17 +84,15 @@ const FarmerLogin = () => {
     <div className="min-h-[calc(100vh-12rem)] flex items-center justify-center py-8 sm:py-12">
       <div className="w-full max-w-md animate-gentle-rise">
         <RoleBasedRedirect />
-        
-        {/* Header */}
+
         <div className="text-center mb-8">
           <div className="inline-flex size-16 sm:size-20 items-center justify-center rounded-2xl bg-surface-leaf text-4xl sm:text-5xl shadow-sm mb-4">
-            {requestedRole === "buyer" ? "🛒" : "🌾"}
+            🌾
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">Welcome Back</h1>
-          <p className="text-base sm:text-lg text-muted-foreground">Sign in to your {roleLabel.toLowerCase()} account</p>
+          <p className="text-base sm:text-lg text-muted-foreground">Sign in to your Farm Market account</p>
         </div>
 
-        {/* Form Card */}
         <Card className="rounded-2xl border-2 shadow-lg">
           <CardContent className="p-6 sm:p-8">
             <form onSubmit={onSubmit} className="space-y-5">
@@ -129,11 +101,11 @@ const FarmerLogin = () => {
                   <Mail className="size-4 text-primary" />
                   Email or Phone Number
                 </label>
-                <Input 
+                <Input
                   id="emailOrPhone"
-                  name="emailOrPhone" 
-                  required 
-                  placeholder="email@example.com or +233201234567" 
+                  name="emailOrPhone"
+                  required
+                  placeholder="email@example.com or +233201234567"
                   className="h-12 rounded-xl text-base"
                 />
               </div>
@@ -144,12 +116,12 @@ const FarmerLogin = () => {
                   Password
                 </label>
                 <div className="relative">
-                  <Input 
+                  <Input
                     id="password"
-                    name="password" 
+                    name="password"
                     type={showPassword ? "text" : "password"}
-                    required 
-                    placeholder="Enter your password" 
+                    required
+                    placeholder="Enter your password"
                     className="h-12 rounded-xl pr-12 text-base"
                   />
                   <button
@@ -164,10 +136,7 @@ const FarmerLogin = () => {
               </div>
 
               <div className="flex justify-end">
-                <Link 
-                  to="/forgot-password" 
-                  className="text-sm font-semibold text-primary hover:underline"
-                >
+                <Link to="/forgot-password" className="text-sm font-semibold text-primary hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -195,14 +164,10 @@ const FarmerLogin = () => {
           </CardContent>
         </Card>
 
-        {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link 
-              to={`/create-account?role=${requestedRole}`}
-              className="font-semibold text-primary hover:underline"
-            >
+            Don&apos;t have an account?{" "}
+            <Link to="/create-account" className="font-semibold text-primary hover:underline">
               Create one now
             </Link>
           </p>

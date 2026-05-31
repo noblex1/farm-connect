@@ -85,7 +85,7 @@ const MyListings = () => {
     <section className="animate-gentle-rise">
       <OfflineNotice />
       <header className="mb-4 sm:mb-5">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black">My Listings</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black">My Produce</h1>
         <p className="mt-1 sm:mt-2 text-base sm:text-lg md:text-xl font-bold text-muted-foreground">Manage your produce quickly</p>
       </header>
 

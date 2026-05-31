@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { sessionStore } from "@/lib/session";
 import { isTokenLikelyExpired } from "@/lib/auth";
+import { getRoleHomePath } from "@/lib/roleHome";
 import type { UserRole } from "@/types/api";
 
 type RequireAuthProps = {
@@ -19,14 +20,12 @@ export const RequireAuth = ({ allowedRoles }: RequireAuthProps) => {
       sessionStore.clearSession();
     }
     
-    const roleQuery = allowedRoles?.[0] ? `role=${allowedRoles[0]}&` : "";
-    return <Navigate to={`/login?${roleQuery}next=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
   // Check if user has required role
   if (allowedRoles && (!user.role || !allowedRoles.includes(user.role))) {
-    const roleQuery = allowedRoles[0] ? `role=${allowedRoles[0]}&` : "";
-    return <Navigate to={`/login?${roleQuery}next=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to={getRoleHomePath(user.role)} replace />;
   }
 
   return <Outlet />;

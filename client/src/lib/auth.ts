@@ -5,7 +5,7 @@ import { sessionStore } from "./session";
  */
 export const logout = () => {
   sessionStore.clearSession();
-  window.location.href = "/login";
+  window.location.href = "/";
 };
 
 /**
