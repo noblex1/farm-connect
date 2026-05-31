@@ -7,36 +7,36 @@ const NewLanding = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-surface-leaf via-background to-surface-warm">
-        <div className="absolute inset-0 field-lines opacity-30" aria-hidden="true" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-surface-leaf via-background to-surface-warm py-16 sm:py-20 lg:py-28">
+        <div className="absolute inset-0 field-lines opacity-20" aria-hidden="true" />
         
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
             {/* Left Content */}
             <div className="animate-gentle-rise">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-4 py-2 mb-6">
                 <Leaf className="size-5 text-primary" />
-                <span className="text-sm font-bold text-primary">Connecting Farmers & Buyers</span>
+                <span className="text-sm font-semibold text-primary">Connecting Farmers & Buyers in Ghana</span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight tracking-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight tracking-tight mb-6">
                 Farm Fresh,
-                <span className="block text-primary">Direct to You</span>
+                <span className="block text-primary mt-2">Direct to You</span>
               </h1>
               
-              <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-xl">
+              <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-10 max-w-2xl leading-relaxed">
                 The modern marketplace connecting farmers directly with buyers. 
                 Fresh produce, fair prices, zero middlemen.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Button asChild size="lg" variant="farm" className="h-14 text-lg font-bold shadow-lg hover:shadow-xl transition-shadow">
+                <Button asChild size="lg" variant="farm" className="h-14 sm:h-16 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                   <Link to="/login?role=buyer">
                     <ShoppingCart className="size-6" />
                     Start Buying
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="h-14 text-lg font-bold border-2">
+                <Button asChild size="lg" variant="outline" className="h-14 sm:h-16 text-base sm:text-lg font-semibold border-2 hover:bg-surface-leaf hover:border-primary transition-all">
                   <Link to="/login?role=farmer">
                     <Leaf className="size-6" />
                     Start Selling
@@ -45,24 +45,24 @@ const NewLanding = () => {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 gap-8">
                 <div>
-                  <div className="text-3xl sm:text-4xl font-black text-primary mb-1">500+</div>
-                  <div className="text-sm text-muted-foreground font-semibold">Active Farmers</div>
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary mb-2">500+</div>
+                  <div className="text-sm sm:text-base text-muted-foreground font-medium">Active Farmers</div>
                 </div>
                 <div>
-                  <div className="text-3xl sm:text-4xl font-black text-primary mb-1">1000+</div>
-                  <div className="text-sm text-muted-foreground font-semibold">Happy Buyers</div>
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary mb-2">1000+</div>
+                  <div className="text-sm sm:text-base text-muted-foreground font-medium">Happy Buyers</div>
                 </div>
                 <div>
-                  <div className="text-3xl sm:text-4xl font-black text-primary mb-1">5000+</div>
-                  <div className="text-sm text-muted-foreground font-semibold">Transactions</div>
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary mb-2">5000+</div>
+                  <div className="text-sm sm:text-base text-muted-foreground font-medium">Transactions</div>
                 </div>
               </div>
             </div>
 
             {/* Right Visual */}
-            <div className="relative">
+            <div className="relative lg:ml-8">
               <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
                 {/* Background Image */}
                 <img 
@@ -72,44 +72,44 @@ const NewLanding = () => {
                 />
                 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-transparent to-secondary/40" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-secondary/30" />
                 
                 {/* Floating Cards */}
                 <div className="relative h-full flex items-center justify-center p-8">
                   <div className="absolute top-8 left-8 animate-leaf-sway">
-                    <Card className="w-32 sm:w-40 shadow-xl backdrop-blur-sm bg-card/95">
+                    <Card className="w-36 sm:w-44 shadow-xl backdrop-blur-sm bg-card/95 border-2">
                       <CardContent className="p-4 text-center">
-                        <div className="text-4xl mb-2">🌽</div>
-                        <div className="text-xs font-bold">Fresh Maize</div>
-                        <div className="text-xs text-primary font-bold">GH₵ 50/bag</div>
+                        <div className="text-4xl sm:text-5xl mb-2">🌽</div>
+                        <div className="text-sm font-semibold">Fresh Maize</div>
+                        <div className="text-sm text-primary font-bold mt-1">GH₵ 50/bag</div>
                       </CardContent>
                     </Card>
                   </div>
 
                   <div className="absolute top-1/4 right-8 animate-leaf-sway" style={{ animationDelay: "0.5s" }}>
-                    <Card className="w-32 sm:w-40 shadow-xl backdrop-blur-sm bg-card/95">
+                    <Card className="w-36 sm:w-44 shadow-xl backdrop-blur-sm bg-card/95 border-2">
                       <CardContent className="p-4 text-center">
-                        <div className="text-4xl mb-2">🍚</div>
-                        <div className="text-xs font-bold">Premium Rice</div>
-                        <div className="text-xs text-primary font-bold">GH₵ 120/bag</div>
+                        <div className="text-4xl sm:text-5xl mb-2">🍚</div>
+                        <div className="text-sm font-semibold">Premium Rice</div>
+                        <div className="text-sm text-primary font-bold mt-1">GH₵ 120/bag</div>
                       </CardContent>
                     </Card>
                   </div>
 
                   <div className="absolute bottom-8 left-1/4 animate-leaf-sway" style={{ animationDelay: "1s" }}>
-                    <Card className="w-32 sm:w-40 shadow-xl backdrop-blur-sm bg-card/95">
+                    <Card className="w-36 sm:w-44 shadow-xl backdrop-blur-sm bg-card/95 border-2">
                       <CardContent className="p-4 text-center">
-                        <div className="text-4xl mb-2">🥔</div>
-                        <div className="text-xs font-bold">Fresh Yam</div>
-                        <div className="text-xs text-primary font-bold">GH₵ 80/tuber</div>
+                        <div className="text-4xl sm:text-5xl mb-2">🥔</div>
+                        <div className="text-sm font-semibold">Fresh Yam</div>
+                        <div className="text-sm text-primary font-bold mt-1">GH₵ 80/tuber</div>
                       </CardContent>
                     </Card>
                   </div>
 
                   {/* Center Badge */}
-                  <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-2xl px-6 py-4 shadow-2xl">
-                    <div className="text-5xl mb-2 text-center">👨🏾‍🌾</div>
-                    <div className="text-sm font-bold text-center">Farm Fresh</div>
+                  <div className="bg-primary/95 backdrop-blur-sm text-primary-foreground rounded-2xl px-8 py-5 shadow-2xl border-2 border-primary">
+                    <div className="text-5xl sm:text-6xl mb-2 text-center">👨🏾‍🌾</div>
+                    <div className="text-base font-semibold text-center">Farm Fresh</div>
                   </div>
                 </div>
               </div>
@@ -119,91 +119,91 @@ const NewLanding = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-24 bg-background">
+      <section className="py-20 sm:py-28 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-4">
+          <div className="text-center mb-16 sm:mb-20">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-6">
               Why Choose Farm Market?
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               We're revolutionizing how farmers and buyers connect, making fresh produce accessible to everyone.
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
             {/* Feature 1 */}
-            <Card className="rounded-2xl border-2 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <Zap className="size-6 text-primary" />
+            <Card className="rounded-2xl border-2 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
+              <CardContent className="p-6 sm:p-8">
+                <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                  <Zap className="size-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-black mb-2">Lightning Fast</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3">Lightning Fast</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Find and purchase fresh produce in seconds. Our streamlined platform makes buying effortless.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 2 */}
-            <Card className="rounded-2xl border-2 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <Shield className="size-6 text-primary" />
+            <Card className="rounded-2xl border-2 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
+              <CardContent className="p-6 sm:p-8">
+                <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                  <Shield className="size-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-black mb-2">100% Secure</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3">100% Secure</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Your transactions are protected with bank-level security. Buy and sell with confidence.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 3 */}
-            <Card className="rounded-2xl border-2 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <Users className="size-6 text-primary" />
+            <Card className="rounded-2xl border-2 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
+              <CardContent className="p-6 sm:p-8">
+                <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                  <Users className="size-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-black mb-2">Direct Connection</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3">Direct Connection</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Connect directly with farmers. No middlemen, better prices for everyone.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 4 */}
-            <Card className="rounded-2xl border-2 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <TrendingUp className="size-6 text-primary" />
+            <Card className="rounded-2xl border-2 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
+              <CardContent className="p-6 sm:p-8">
+                <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                  <TrendingUp className="size-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-black mb-2">Fair Pricing</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3">Fair Pricing</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Real-time market prices ensure farmers get fair value and buyers get competitive rates.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 5 */}
-            <Card className="rounded-2xl border-2 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <Smartphone className="size-6 text-primary" />
+            <Card className="rounded-2xl border-2 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
+              <CardContent className="p-6 sm:p-8">
+                <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                  <Smartphone className="size-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-black mb-2">Mobile First</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3">Mobile First</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Works perfectly on any device. Trade on the go with our mobile-optimized platform.
                 </p>
               </CardContent>
             </Card>
 
             {/* Feature 6 */}
-            <Card className="rounded-2xl border-2 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <Globe className="size-6 text-primary" />
+            <Card className="rounded-2xl border-2 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 duration-300">
+              <CardContent className="p-6 sm:p-8">
+                <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                  <Globe className="size-7 text-primary" />
                 </div>
-                <h3 className="text-xl font-black mb-2">Works Offline</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3">Works Offline</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Access your listings even without internet. Perfect for rural areas with limited connectivity.
                 </p>
               </CardContent>

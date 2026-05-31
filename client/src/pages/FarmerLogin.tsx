@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { loginUser } from "@/services/marketApi";
 import { sessionStore } from "@/lib/session";
 import { useToast } from "@/hooks/use-toast";
@@ -106,73 +107,108 @@ const FarmerLogin = () => {
   };
 
   return (
-    <section className="animate-gentle-rise">
-      <RoleBasedRedirect />
-      <header className="mb-4 sm:mb-5 rounded-2xl sm:rounded-3xl bg-surface-leaf p-4 sm:p-5 shadow-touch">
-        <div className="mb-3 grid size-14 sm:size-16 place-items-center rounded-2xl bg-card text-3xl sm:text-4xl shadow-touch" aria-hidden="true">
-          🌾
-        </div>
-        <h1 className="text-2xl sm:text-4xl font-black">{roleLabel} Login</h1>
-        <p className="mt-1.5 sm:mt-2 text-base sm:text-xl font-bold text-muted-foreground">Sign in to your account</p>
-      </header>
-
-      <form onSubmit={onSubmit} className="grid gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border bg-card p-4 sm:p-5 md:p-6 shadow-touch">
-        <label className="grid gap-2 text-base sm:text-lg font-black">
-          <span className="flex items-center gap-2">
-            <Mail className="size-6 text-secondary" />Email or Phone Number
-          </span>
-          <Input 
-            name="emailOrPhone" 
-            required 
-            placeholder="email@example.com or +233201234567" 
-            className="min-h-14 sm:min-h-16 rounded-2xl text-base sm:text-xl font-bold"
-          />
-        </label>
-
-        <label className="grid gap-2 text-base sm:text-lg font-black">
-          <span className="flex items-center gap-2">
-            <Lock className="size-6 text-secondary" />Password
-          </span>
-          <div className="relative">
-            <Input 
-              name="password" 
-              type={showPassword ? "text" : "password"}
-              required 
-              placeholder="Enter your password" 
-              className="min-h-14 sm:min-h-16 rounded-2xl pr-14 text-base sm:text-xl font-bold"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff className="size-6" /> : <Eye className="size-6" />}
-            </button>
+    <div className="min-h-[calc(100vh-12rem)] flex items-center justify-center py-8 sm:py-12">
+      <div className="w-full max-w-md animate-gentle-rise">
+        <RoleBasedRedirect />
+        
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex size-16 sm:size-20 items-center justify-center rounded-2xl bg-surface-leaf text-4xl sm:text-5xl shadow-sm mb-4">
+            {requestedRole === "buyer" ? "🛒" : "🌾"}
           </div>
-        </label>
-
-        <div className="flex justify-end">
-          <Link 
-            to="/forgot-password" 
-            className="text-sm font-bold text-primary hover:underline"
-          >
-            Forgot password?
-          </Link>
+          <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">Welcome Back</h1>
+          <p className="text-base sm:text-lg text-muted-foreground">Sign in to your {roleLabel.toLowerCase()} account</p>
         </div>
 
-        {error && <span className="text-base font-bold text-destructive">{error}</span>}
+        {/* Form Card */}
+        <Card className="rounded-2xl border-2 shadow-lg">
+          <CardContent className="p-6 sm:p-8">
+            <form onSubmit={onSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="emailOrPhone" className="text-sm font-semibold flex items-center gap-2">
+                  <Mail className="size-4 text-primary" />
+                  Email or Phone Number
+                </label>
+                <Input 
+                  id="emailOrPhone"
+                  name="emailOrPhone" 
+                  required 
+                  placeholder="email@example.com or +233201234567" 
+                  className="h-12 rounded-xl text-base"
+                />
+              </div>
 
-        <Button type="submit" variant="farm" size="touch" disabled={isLoading}>
-          <LogIn className="size-7" />{isLoading ? "Logging in..." : "Login"}
-        </Button>
-        <Button asChild variant="harvest" size="touch">
-          <Link to={`/create-account?role=${requestedRole}`}>
-            <Sprout className="size-7" />Create Account
-          </Link>
-        </Button>
-      </form>
-    </section>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-semibold flex items-center gap-2">
+                  <Lock className="size-4 text-primary" />
+                  Password
+                </label>
+                <div className="relative">
+                  <Input 
+                    id="password"
+                    name="password" 
+                    type={showPassword ? "text" : "password"}
+                    required 
+                    placeholder="Enter your password" 
+                    className="h-12 rounded-xl pr-12 text-base"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Link 
+                  to="/forgot-password" 
+                  className="text-sm font-semibold text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              {error && (
+                <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-sm font-medium text-destructive">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" variant="farm" size="lg" className="w-full h-12 text-base font-semibold" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <div className="size-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="size-5" />
+                    Sign In
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Link 
+              to={`/create-account?role=${requestedRole}`}
+              className="font-semibold text-primary hover:underline"
+            >
+              Create one now
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
